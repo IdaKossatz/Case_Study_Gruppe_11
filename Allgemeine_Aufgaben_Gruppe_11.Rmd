@@ -11,7 +11,7 @@ library(dplyr)
 library(lubridate)
 library(ggplot2)
 
-#Zunächst müssen zwei Excel-Dokumente eingelesen werden, um sie für weitere Berechnungen zu einem Dokument zusammenzufassen. 
+# Zunächst müssen zwei Excel-Dokumente eingelesen werden, um sie für weitere Berechnungen zu einem Dokument zusammenzufassen. 
 komponente_k7 <- read.csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
 logistikverzug_k7 <- read.csv(".\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
 
@@ -147,7 +147,7 @@ ausgabeDaten <- data.frame(Attribut = names(datentypen), Datentyp = datentypen, 
 kable(ausgabeDaten, format = "markdown", col.names = c("Attribut", "Datentyp"), row.names = FALSE)
 
 
-#Nach der Ausführung dieses Codes analysiert R jede Spalte und gibt den entsprechenden Attributtyp in einer Tabelle aus, die letztendlich wie folgt aussieht: 
+# Nach der Ausführung dieses Codes analysiert R jede Spalte und gibt den entsprechenden Attributtyp in einer Tabelle aus, die letztendlich wie folgt aussieht: 
 
 
 <!-- |Attribut  |Datentyp | -->
