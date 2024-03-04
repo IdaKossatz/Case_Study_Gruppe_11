@@ -1,11 +1,12 @@
 #install.packages("tidyverse")
-library(readr) # für read_csv, read_delim, readLines
-library(dplyr) # für daten aufarbeitung, joins, etc
+library(readr) # fuer read_csv, read_delim, readLines
+library(dplyr) # fuer daten aufarbeitung, joins, etc
 library(tidyr) # drop_na, Datenreinigung
-library(stringr) # string replace funktion für die Textdateien mit nicht standardmässigen Zeilen-/Spaltenumbrüchen
+library(stringr) # string replace funktion fuer die Textdateien mit nicht standardmaessigen Zeilen-/Spaltenumbruechen
 
+# author: Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684), Alik Aylarov (389982), Ange Adissin (455022)
 #--------------------------------------------------------------------------------------------------------------------
-# Allgemeiner Import, wird immer benötigt, Fahrzeugmodell basiert darauf
+# Allgemeiner Import, wird immer benoetigt, Fahrzeugmodell basiert darauf
 
 Fahrzeuge_OEM1_Typ11 <- read_csv(".\\Data\\Fahrzeug\\Fahrzeuge_OEM1_Typ11.csv")
 Bestandteile_Fahrzeuge_OEM1_Typ11 <- read_csv2(".\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM1_Typ11.csv ")
@@ -13,19 +14,19 @@ Bestandteile_Fahrzeuge_OEM1_Typ11 <- read_csv2(".\\Data\\Fahrzeug\\Bestandteile_
 Fahrzeuge_OEM1_Typ11_Fehleranalyse <- read_csv(".\\Data\\Fahrzeug\\Fahrzeuge_OEM1_Typ11_Fehleranalyse.csv")
 
 # Join von allen drei Haupttabellen, um pro Fahrzeug nur einen Datensatz zu haben.
-# Wird erst gejoint und dann nur auf die fehlerhaften Datensätze beschränkt, um den Rechenaufwand für
-# die Komponenten später zu reduzieren
+# Wird erst gejoint und dann nur auf die fehlerhaften Datensaetze beschraenkt, um den Rechenaufwand fuer
+# die Komponenten spaeter zu reduzieren
 Fahrzeuge_OEM1_Typ11 <- Fahrzeuge_OEM1_Typ11 %>%
   left_join(Bestandteile_Fahrzeuge_OEM1_Typ11, by="ID_Fahrzeug") %>%
   left_join(Fahrzeuge_OEM1_Typ11_Fehleranalyse, by="ID_Fahrzeug") %>%
   drop_na() %>%
   select(ID_Fahrzeug, ID_Motor, ID_Schaltung, ID_Karosserie, ID_Sitze, Betriebsdauer = days, Produktionsdatum)
 
-# rm löscht Variablen die spaeter nicht mehr benötigt werden. Das gibt RAM wieder frei
+# rm loescht Variablen die spaeter nicht mehr benoetigt werden. Das gibt RAM wieder frei
 rm(Bestandteile_Fahrzeuge_OEM1_Typ11, Fahrzeuge_OEM1_Typ11_Fehleranalyse)
 
-# Funktion die Komponenten mit den Fahrzeugdaten joined und die nötigen Parameter extrahiert
-# Variable Join ist ein String, da für Motoren, Schaltungen etc. verschiedene ID'S gejoined werden müssen
+# Funktion die Komponenten mit den Fahrzeugdaten joined und die noetigen Parameter extrahiert
+# Variable Join ist ein String, da fuer Motoren, Schaltungen etc. verschiedene ID'S gejoined werden muessen
 Komponente_Transform <- function (Komponente, Join = ""){
   Komponente <- Komponente %>%
     filter(!is.na(Fehlerhaft_Datum)) %>% # nur fehlerhafte Komponenten sollen betrachtet werden
@@ -39,7 +40,7 @@ Komponente_Transform <- function (Komponente, Join = ""){
 
 
 # Funktion die Einzelteile mit den Daten der Komponente joined
-# Variable Join ist ein String da die Teil ID für jedes Einzelteil anders ist
+# Variable Join ist ein String da die Teil ID fuer jedes Einzelteil anders ist
 Einzelteil_Transform <- function(Teil, Komponente, Join = ""){
   Teil <- Teil %>%
     left_join(Komponente, by=Join) %>%
@@ -52,9 +53,9 @@ Einzelteil_Transform <- function(Teil, Komponente, Join = ""){
 
 #--------------------------------------------------------------------------------------------------------------------
 # Komponente K1BE1
-# Aufbau für jede Komponente gleich:
+# Aufbau fuer jede Komponente gleich:
 
-# 1. Einlesen der Datei, ist bei Komma und Semikolon getrennten Dateien mit vorgefertigen Funktionen möglich
+# 1. Einlesen der Datei, ist bei Komma und Semikolon getrennten Dateien mit vorgefertigen Funktionen moeglich
 Komponente_K1BE1 <- read_csv(".\\Data\\Komponente\\Komponente_K1BE1.csv")
 
 # 2.Gegebenenfalls Anpassen der Tabelle, so dass die Spalten jeder Komponenten- bzw. Einzelteiltabelle
@@ -63,13 +64,13 @@ Komponente_K1BE1 <- Komponente_K1BE1 %>%
   mutate(Produktionsdatum = as.Date(Produktionsdatum_Origin_01011970)) %>%
   select(c(Fehlerhaft_Fahrleistung, Fehlerhaft_Datum, Herstellernummer, ID_Motor, Produktionsdatum))
 
-# 3. Die "Transform" Funktion für Komponenten wird aufgerufen, mit den dazugehörigen Argumenten.
+# 3. Die "Transform" Funktion fuer Komponenten wird aufgerufen, mit den dazugehoerigen Argumenten.
 Komponente_K1BE1 <- Komponente_Transform(Komponente_K1BE1, "ID_Motor")
 
 # 4. Einlesen der Tabelle "Bestandteile der Komponente"
 Bestandteile_Komponente_K1BE1 <- read_csv2(".\\Data\\Komponente\\Bestandteile_Komponente_K1BE1.csv")
 
-# 5. Joinen der Bestandteile der Komponente mit der Komponente, um die Einzelteile zuordnen zu können
+# 5. Joinen der Bestandteile der Komponente mit der Komponente, um die Einzelteile zuordnen zu koennen
 Komponente_K1BE1 <- Komponente_K1BE1 %>%
   left_join(Bestandteile_Komponente_K1BE1, by=join_by("ID_Self" == ID_K1BE1))
 
@@ -77,28 +78,28 @@ Komponente_K1BE1 <- Komponente_K1BE1 %>%
 # Da einzeilig und mit 5 Zeichen langem Delimiter, muss erst im String einiges ersetzt werden,
 # damit es effizient umgewandelt werden kann
 Einzelteil_T01_str <- readLines(paste(".\\Data\\Einzelteil\\Einzelteil_T01.txt"), warn=FALSE)
-Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, "[|]", "") # ersetzt Spaltenumbrüche
+Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, "[|]", "") # ersetzt Spaltenumbrueche
 Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, "[[:space:]]{3}", "\t")
-Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, " \"", "\n\"") # ersetzt Zeilenumbrüche
-#read_delim braucht eine Datei, deswegen wird der String in eine temporäre Datei gespeichert
+Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, " \"", "\n\"") # ersetzt Zeilenumbrueche
+#read_delim braucht eine Datei, deswegen wird der String in eine temporaere Datei gespeichert
 tf <- tempfile()
 writeLines(Einzelteil_T01_str, tf)
 Einzelteil_T01 <- read_delim(tf, col_names = c("ID", "X1", "ID_T1", "Produktionsdatum", "Herstellernummer", "Werksnummer",
                                                "Fehlerhaft", "Fehlerhaft_Datum", "Fehlerhaft_Fahrleistung"), skip = 1)
-# Danach werden der String und das "temporary file" (tf) gelöscht um RAM freizugeben.
+# Danach werden der String und das "temporary file" (tf) geloescht um RAM freizugeben.
 rm(Einzelteil_T01_str, tf)
 
-# Zwischenspeichern der Datei, da diese auch für eine andere Komponente benötigt wird und so das doppelte Importieren vermieden wird
+# Zwischenspeichern der Datei, da diese auch fuer eine andere Komponente benoetigt wird und so das doppelte Importieren vermieden wird
 Einzelteil_T01_K1DI1 <- Einzelteil_T01
 
-# 7. Die benötigten Spalten aus der Einzelteiltabelle auswählen und falls im Schritt 6 noch nicht geschehen, die Spaltennamen anpassen an die vorab festgelegten Namen.
+# 7. Die benoetigten Spalten aus der Einzelteiltabelle auswaehlen und falls im Schritt 6 noch nicht geschehen, die Spaltennamen anpassen an die vorab festgelegten Namen.
 Einzelteil_T01 <- Einzelteil_T01 %>%
   select(c(Fehlerhaft_Fahrleistung, Herstellernummer, ID_T1, Produktionsdatum))
 
 # 8. Einzelteil Funktionsaufruf
 Einzelteil_T01 <- Einzelteil_Transform(Einzelteil_T01, Komponente_K1BE1, "ID_T1")
 
-# 9. Schritt 6-8 ür alle Einzelteile der Komponente wiederholen
+# 9. Schritt 6-8 uer alle Einzelteile der Komponente wiederholen
 Einzelteil_T02_str <- readLines(paste(".\\Data\\Einzelteil\\Einzelteil_T02.txt"), warn=FALSE)
 Einzelteil_T02_str <- str_replace_all(Einzelteil_T02_str, "\t", "\n") # replace linebreaks
 Einzelteil_T02_str <- str_replace_all(Einzelteil_T02_str, "  ", ",") # replace linebreaks
@@ -133,21 +134,21 @@ Einzelteil_T04 <- Einzelteil_T04 %>%
   select(c(Fehlerhaft_Fahrleistung, Herstellernummer, ID_T4 = ID_T04, Produktionsdatum))
 Einzelteil_T04 <- Einzelteil_Transform(Einzelteil_T04, Komponente_K1BE1, "ID_T4")
 
-# 10. Zusammenfügen aller Einzelteile in die Tabelle der Komponente. Dabei werden nur die Spalten ausgewählt,
-# welche für den weiteren Verlauf wichtig sind. Somit werden die Spalten weggelassen,
-# welche nur für das Verknüpfen der Tabellen relevant waren. Die Funktion bind_rows() fügt dabei die Tabellen übereinander ein.
+# 10. Zusammenfuegen aller Einzelteile in die Tabelle der Komponente. Dabei werden nur die Spalten ausgewaehlt,
+# welche fuer den weiteren Verlauf wichtig sind. Somit werden die Spalten weggelassen,
+# welche nur fuer das Verknuepfen der Tabellen relevant waren. Die Funktion bind_rows() fuegt dabei die Tabellen uebereinander ein.
 Komponente_K1BE1 <- Komponente_K1BE1 %>%
   select(c(Fehlerhaft_Fahrleistung, Betriebsdauer, Herstellernummer, ID_Self, ID_Parent, Lieferdauer, Produktionsdatum)) %>%
   bind_rows(list(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04))
 
-# 11. Danach werden alle ursprünglichen Dateien gelöscht, welche jetzt sortiert und aufgearbeitet
-# in der finalen Tabelle als Kopie vorhanden sind, um Arbeitsspeicher einzusparen und da diese nicht mehr benötigt werden.
+# 11. Danach werden alle urspruenglichen Dateien geloescht, welche jetzt sortiert und aufgearbeitet
+# in der finalen Tabelle als Kopie vorhanden sind, um Arbeitsspeicher einzusparen und da diese nicht mehr benoetigt werden.
 rm(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04, Bestandteile_Komponente_K1BE1)
 
 #--------------------------------------------------------------------------------------------------------------------
 # Komponente K1DI1
 
-# 12. Wiederhole das Schema für alle Komponenten & Einzelteile
+# 12. Wiederhole das Schema fuer alle Komponenten & Einzelteile
 Komponente_K1DI1 <- read_csv(".\\Data\\Komponente\\Komponente_K1DI1.csv")
 Komponente_K1DI1 <- Komponente_K1DI1 %>%
   select(c(Fehlerhaft_Fahrleistung = Fehlerhaft_Fahrleistung.x, Fehlerhaft_Datum = Fehlerhaft_Datum.x,
@@ -401,10 +402,10 @@ Komponente_K4 <- Komponente_K4 %>%
 rm(Einzelteil_T30, Einzelteil_T31, Einzelteil_T32, Bestandteile_Komponente_K4)
 
 # -------------------------------------------------------------------------------------------------------
-# 13. Nun werden alle Tabellen, welche in Schritt 1 - 12 erstellt wurden, hintereinander in eine neue Tabelle zusammengefügt.
+# 13. Nun werden alle Tabellen, welche in Schritt 1 - 12 erstellt wurden, hintereinander in eine neue Tabelle zusammengefuegt.
 result <- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, Komponente_K2ST1, Komponente_K3AG1,
                           Komponente_K3SG1, Komponente_K4)) #%>%
 
 
-# 14. Abschließend wird die finale Tabelle als .csv Datei gespeichert.
+# 14. Abschliessend wird die finale Tabelle als .csv Datei gespeichert.
 write_csv(result, "Final_Data_Group11.csv")
