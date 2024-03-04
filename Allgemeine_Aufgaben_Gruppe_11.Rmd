@@ -22,70 +22,70 @@ library(yaml)
 
 Vorbereiten der Programmierumgebung
 Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das dplyr Package installiert und die Packages lubridate, ggplot2, knitr und stringr geladen.
-```
-install.packages("dplyr")
-install.packages("lubridate")
-install.packages("ggplot2")
-install.packages("stringr")
-install.packages("knitr")
+
+```{r}
+
 
 library(dplyr)
 library(lubridate)
 library(ggplot2)
 ```
+
 # Aufgabe 1
 Zunächst müssen zwei Excel-Dokumente eingelesen werden, um sie für weitere Berechnungen zu einem Dokument zusammenzufassen. 
-```
+```{r}
 komponente_k7 <- read.csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
 logistikverzug_k7 <- read.csv(".\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
 ```
 Zusammenführung der Datenrahmen anhand der IDNummer
-```
+```{r}
 gesamt_df <- merge(komponente_k7, logistikverzug_k7, by.x="IDNummer", by.y="IDNummer")
 ```
 
 Datumsumwandlung für die Berechnung des Logistikverzugs
-```
+```{r}
 gesamt_df$Produktionsdatum <- as.Date(gesamt_df$Produktionsdatum, format = "%Y-%m-%d")
 gesamt_df$Wareneingang <- as.Date(gesamt_df$Wareneingang, format = "%d.%m.%Y")
 ```
 
 Berechnung des Logistikverzugs in Tagen (unter Berücksichtigung eines weiteren Tags für Versandvorbereitung). Angenommen wurde, dass vom Zeitpunkt der Produktion bis zur Übergabe der Waren an die Logistik ein Tag vergeht und ein weiterer Tag für die Vorbereitung der Waren für den Versand benötigt wird. Um den Versandtag zu berechnen, müssen also zwei Tage zum Tag der Produktion der Waren hinzugezählt werden.
-```
+```{r}
 gesamt_df <- gesamt_df %>%
   mutate(Logistikverzug = as.numeric(difftime(Wareneingang, Produktionsdatum + days(2), units = "days")))  # Plus 2 Tage für Lieferungvorbereitung und Versandvorbereitung
 ```
+
 ## Verteilung des Logistikverzugs
 Mit Hilfe der untenstehenden Graphs und den Durchschnitts-, Minimal- und Maximalwerten können wir einige Rückschlüsse auf die Verteilung des Logistikverzugs ziehen. Daraus können wir schließen, dass im Durchschnitt 3 Tage zwischen Warenausgang und Wareneingang vergehen. Obwohl dies für den Empfänger ein akzeptabler Wert ist, gibt es noch Optimierungsmöglichkeiten, denn es gibt zumindest einige Fälle, in denen der Logistikverzug 0 war und der Kunde seine Ware noch am selben Tag erhalten hat. Ein genauerer Blick auf die Verteilungsgrafiken des Logistikverzugs nach Quartalen gibt Aufschluss darüber, wie der durchschnittliche Logistikverzugswert nach Quartalen variiert und welche Verbesserungsmöglichkeiten bestehen. Im Jahr 2016 wies zum Beispiel Q2 die besten und Q4 die schlechtesten Werte auf. Dies deutet darauf hin, dass die Logistikrouten in kälteren Perioden optimiert werden müssen (z. B. durch bessere Transportmöglichkeiten oder die Bereitstellung von Winterreifen für Transportfahrzeuge im Voraus). 
 
 ## min-max Berechnung
 Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```
+```{r}
 min_zeit <- min(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```
+```{r}
 max_zeit <- max(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Ausgabe der Ergebnisse
-```
+```{r}
 cat("Minimale Zeitunterschied zwischen Warenausgang und Wareneingang:", min_zeit, "Tage\n")
 cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit, "Tage\n")
 ```
+
 ## Mittelwertsberechnung
 Mittelwert des Logistikverzugs berechnen
-```
+```{r}
 mittelwert_logistikverzug <- mean(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 Ausgabe des Mittelwerts
-```
+```{r}
 cat("Mittelwert des Logistikverzugs:", mittelwert_logistikverzug, "Tage\n")
 ```
 
 Histogramm des Logistikverzugs erstellen
-```
+```{r}
 ggplot(gesamt_df, aes(x=Logistikverzug)) +
   geom_histogram(binwidth=1, fill="blue", color="black") +
   theme_minimal() +
