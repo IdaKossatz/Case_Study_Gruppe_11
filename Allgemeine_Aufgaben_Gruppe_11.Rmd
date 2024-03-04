@@ -1,7 +1,7 @@
 ---
 title: Allgemeine Aufgaben Gruppe 11
-author: Alik Aylarov
-date: '2024-03-03'
+author: Alik Aylarov (389982), Ange Adissin (455022), Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684)
+date: '04-03-2024'
 output:
   html_document:
     toc: true
@@ -24,7 +24,11 @@ Vorbereiten der Programmierumgebung
 Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das dplyr Package installiert und die Packages lubridate, ggplot2, knitr und stringr geladen.
 
 ```{r}
-
+# install.packages("dplyr")
+# install.packages("lubridate")
+# install.packages("ggplot2")
+# install.packages("stringr")
+# install.packages("knitr")
 
 library(dplyr)
 library(lubridate)
@@ -209,7 +213,7 @@ print(paste("Anzahl der in Wehr, Landkreis Waldshut zugelassenen Fahrzeuge mit K
 ```
 
 
-#Aufgabe 4.
+# Aufgabe 4.
 
 Laden des knitr-Pakets
 ```
@@ -253,7 +257,7 @@ Nach der Ausführung dieses Codes analysiert R jede Spalte und gibt den entsprec
 
 
 
-#Aufgabe 5.
+# Aufgabe 5.
 
 ## - Warum ist es gerade dann sinnvoll, die Datensätze auf der Datenbank eines Servers abzulegen?
 

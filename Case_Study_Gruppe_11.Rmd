@@ -1,7 +1,7 @@
 ---
 title: Case Study Gruppe 11
-author: Ida Kossatz
-date: '2024-02-23'
+author: Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684), Alik Aylarov (389982), Ange Adissin (455022)
+date: '2024-03-04'
 output:
   html_document:
     toc: true
@@ -19,8 +19,10 @@ output:
 
 library(yaml)
 ```
+In diesem Dokument werden die Schritte und Abläufe der Case_Study_App_Gruppe_11.R Datei beschrieben und erklärt.
+
 # Vorbereiten der Programmierumgebung
-Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das Tidyverse Package installiert und die Packages readr, dplyr, tidyr und stringr geladen.
+Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können, wird das Tidyverse Package installiert und die Packages readr, dplyr, tidyr und stringr geladen.
 
 ```
 install.packages("tidyverse")
@@ -32,36 +34,43 @@ library(stringr)
 
 
 # Importieren der Daten
-Um die Case Study bearbeiten zu können wurden folgende Datensätze wurden importiert.
-Dabei sind die Einzeldateien zugehörig zu ihren jeweiligen Komponenten aufgelistet. Sollten Daten aus den Einzelteile Tabellen für unterschiedliche Komponenten genutzt werden, so werden diese einmal beim ersten Aufruf importiert.
-Da für die Aufgabe Einzelteile und Komponenten aus dem Fahrzeug Typ 11 gebraucht werden, welches von der Firma OEM1 gebaut wird, werden anhand der ersten drei Tabellen die restlichen benötigten Dateien rausgesucht.
+Um die Case Study bearbeiten zu können wurden folgende Datensätze importiert.
+Dabei sind die Einzelteile zugehörig zu ihren jeweiligen Komponenten aufgelistet. Sollten Daten aus den Einzelteile Tabellen für unterschiedliche Komponenten genutzt werden, so werden diese einmalig  beim ersten Aufruf importiert.
+Da für die Aufgabe Einzelteile und Komponenten aus dem Fahrzeug Typ 11, gebaut von der Firma OEM1, gefragt sind, werden anhand der ersten drei Tabellen sowie der jeweiligen Bestandteile_Komponente_KomponentenID Tabellen die restlichen benötigten Dateien rausgesucht. 
 
 - Fahrzeuge_OEM1_Typ11
 - Bestandteile_Fahrzeuge_OEM1_Typ11
 - Fahrzeuge_OEM1_Typ11_Fehleranalyse
 - Komponente_K1BE1
+  - Bestandteile_Komponente_K1BE1
   - Einzelteil_T01
   - Einzelteil_T02
   - Einzelteil_T03
   - Einzelteil_T04
 - Komponente_K1DI1
+  - Bestandteile_Komponente_K1DI1
   - Einzelteil_T05
   - Einzelteil_T06
 - Komponente_K2LE1
+  - Bestandteile_Komponente_K2LE1
   - Einzelteil_T11
   - Einzelteil_T14
   - Einzelteil_T15
 - Komponente_K2ST1
+  - Bestandteile_Komponente_K2ST1
   - Einzelteil_T12
   - Einzelteil_T13
 - Komponente_K3AG1
+  - Bestandteile_Komponente_K3AG1 
   - Einzelteil_T21
   - Einzelteil_T24
   - Einzelteil_T25
 - Komponente_K3SG1
+  - Bestandteile_Komponente_K3SG1
   - Einzelteil_T22
   - Einzelteil_T23
 - Komponente_K4
+  - Bestandteile-Komponente_K4
   - Einzelteil_T30
   - Einzelteil_T31
   - Einzelteil_T32
@@ -73,7 +82,7 @@ Anhand folgender Beispiele wurden oben genannte Dateien importiert.
 Die unterschiedlichen Importbefehle werden jeweils anhand von Beispielen aus dem Originalcode gezeigt.
 
 ### .csv
-CSV Dateien bei welcher die Spalten mit einem Komma separiert sind werden wie folgt importiert. In diesem Fall wird die Datei Fahrzeuge OEM Typ 11 als Beispiel genutzt.
+CSV Dateien bei welcher die Spalten mit einem Komma separiert sind, werden wie folgt importiert. In diesem Fall wird die Datei Fahrzeuge OEM Typ 11 als Beispiel genutzt.
 ```
 Fahrzeuge_OEM1_Typ11 <- read_csv(".\\Data\\Fahrzeug\\Fahrzeuge_OEM1_Typ11.csv")
 ```
@@ -86,7 +95,7 @@ Bestandteile_Fahrzeuge_OEM1_Typ11 <- read_csv2(".\\Data\\Fahrzeug
 ```
 
 ### .txt einzeilig
-Einzeilige Text (.txt) Dateien werden zuerst als String eingelesen. Anschließend werden die Spalten Delimiter mit `\t` ersetzt und die Zeilen Delimiter mit `\n`.
+Einzeilige Text (.txt) Dateien werden zuerst als String eingelesen. Anschließend werden die Spalten Delimiter mit `\t` ersetzt und die Zeilen Delimiter mit `\n`. In diesem Fall wird die Datei Einzelteil_T01.txt als Beispiel genutzt.
 ```
 Einzelteil_T01_str <- readLines(paste(".\\Data\\Einzelteil\\Einzelteil_T01.txt"), warn=FALSE)
 Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, "[|]", "")
@@ -108,7 +117,7 @@ rm(Einzelteil_T01_str, tf)
 ```
 
 ### .txt mehrzeilig
-Da R bei mehrzeiligen .txt Dateien den Zeilenumbruch erkennt, muss nur der Spaltenumbruch festgelegt werden. Auch hier werden die Spaltennamen für einheitliches Arbeiten  eigenständig festgelegt.
+Da R bei mehrzeiligen .txt Dateien den Zeilenumbruch erkennt, muss nur der Spaltenumbruch festgelegt werden. Auch hier werden die Spaltennamen für einheitliches Arbeiten  eigenständig festgelegt.  In diesem Fall wird die Datei Komponente_k2ST1.txt als Beispiel genutzt.
 
 ```
 Komponente_K2ST1 <- read_delim(".\\Data\\Komponente\\Komponente_K2ST1.txt", delim="|",
@@ -120,22 +129,21 @@ Komponente_K2ST1 <- read_delim(".\\Data\\Komponente\\Komponente_K2ST1.txt", deli
 
 # Datenaufbereitung
 
-## Anpassung und Verbinden von Tabellen
+## Anpassen und Verbinden von Tabellen mithilfe von Funktionen
 Da abschließend eine Tabelle mit allen benötigten Daten erstellt werden soll, müssen die benötigten Tabellen sortiert, gereinigt und miteinander verbunden werden.
-Diese Befehle werden für so gut wie jede Tabelle genutzt, deshalb bietet es sich an dies durch Funktionen zu definieren, welche dann nur noch aufgerufen werden müssen.
+Diese Befehle werden für jede Tabelle genutzt, deshalb bietet es sich an dies durch Funktionen zu definieren, welche dann nur noch aufgerufen werden müssen.
 Dabei werden innerhalb der Funktion auch einzelne Spalten manipuliert und fehlerhafte Daten aussortiert um anschließend einen sortierten Datensatz zu erhalten.
 Die finale Tabelle soll aus allen benötigten Komponenten und Einzelteilen folgende Spalten beinhalten:
 
 - Fehlerhafte Fahrleistung
 - Betriebsdauer
 - Herstellernummer
-- ID Self
-- ID Parent
+- ID-Self
+- ID-Parent
 - Lieferdauer
 - Produktionsdatum
 
-ID-Self beinhaltet dabei die ID des Einzelteils oder der Komponente und ID-Parent beschreibt die bei Einzelteilen die ID der dazugehörigen Komponente, sowie bei Komponenten die dazugehörigen ID des Fahrzeugs. Es wäre möglich diese zwei Attribute in eine Spalte mit eine Namen wie z.B. ID einzusortieren, da jeweils nur die Komponenten ID wirklich relevante ist, jedoch ist es übersichtlicher und leichter verständlich wenn beide Attribute in separaten Spalten beibehalten werden.
-
+ID-Self beinhaltet dabei die ID des Einzelteils oder der Komponente und ID-Parent beschreibt bei Einzelteilen die ID der dazugehörigen Komponente, sowie bei Komponenten die dazugehörigen ID des Fahrzeugs. Es wäre möglich diese zwei Attribute in eine Spalte mit eine Namen wie z.B. ID einzusortieren, da jeweils nur die Komponenten ID wirklich relevant ist, jedoch ist es übersichtlicher und leichter verständlich wenn beide Attribute in separaten Spalten beibehalten werden. Die jeweiligen IDs sind für das Plotten der geforderten Graphen relevant.
 
 ### Funktionen zum Verbinden von Tabellen {.tabset}
 
@@ -177,7 +185,7 @@ Einzelteil_Transform <- function(Teil, Komponente, Join = ""){
 ```
 
 ## Importieren, Anpassen und Speichern der Einzelteile und der Komponenten (Teil 1)
-Zunächst wird der Ablauf beschreiben, welcher den Import, das Anpassen mit den oben beschriebenen Funktionen und das finale Speichern als Variable durchführt. Dies ist für jede Komponente annähernd identisch und wird deshalb nur anhand einer Komponente beispielhaft beschrieben. In diesem Fall Komponente K1BE1.
+Zunächst wird der Ablauf beschreiben, welcher den Import, das Anpassen mit den oben beschriebenen Funktionen und das finale Speichern als Variable ausführt. Dies ist für jedes Einzelteil bzw. jede Komponente annähernd identisch und wird deshalb nur anhand einer Komponente beispielhaft beschrieben. In diesem Fall Komponente K1BE1.
 
 1. Einlesen der Datei mit Hilfe der oben beschriebenen [Import Funktionen für unterschiedliche Dateitypen] .
 
@@ -185,7 +193,7 @@ Zunächst wird der Ablauf beschreiben, welcher den Import, das Anpassen mit den 
 Komponente_K1BE1 <- read_csv(".\\Data\\Komponente\\Komponente_K1BE1.csv")
 ```
 
-2. Gegebenenfalls Anpassen der Tabelle, so dass alle Spalten den gleichen Namen tragen und den richtigen Dateityp haben. Das ist wichtig, damit die "Transform" Funktionen funktionieren.
+2. Gegebenenfalls Anpassen der Tabelle, so dass die Spalten jeder Komponenten- bzw. Einzelteiltabelle uniforme Namen und Datentypen haben. Das ist wichtig, damit die "Transform" Funktionen funktionieren.
 ```
 Komponente_K1BE1 <- Komponente_K1BE1 %>%
   mutate(Produktionsdatum = as.Date(Produktionsdatum_Origin_01011970)) %>%
@@ -209,8 +217,8 @@ Komponente_K1BE1 <- Komponente_K1BE1 %>%
   left_join(Bestandteile_Komponente_K1BE1, by=join_by("ID_Self" == ID_K1BE1))
 ```
 
-6. Einlesen der Einzelteildateien, welche in diesem Beispiel eine .txt Datei ist. Dieser Vorgang wird in Abschnitt "[Importbefehle für unterschiedliche Dateitypen]" ausführlich beschrieben. Hinzu kommt hier nur noch das Zwischenspeichern der Datei, da diese auch für eine andere Komponente benötigt wird und so das doppelte importieren vermieden wird.
-In diesem Beispiel wird für eine Komponente nur ein Einzelteil eingelesen. Welche Einzelteile für welche Komponenten benötigt werden ist aus der Auflistung im Abschnitt "[Importieren der Daten]" zu entnehmen. In dem Fall von mehreren Einzelteil pro Komponente erfolgt das Importieren und Einbinden analog. 
+6. Einlesen der Einzelteildateien, welche in diesem Beispiel eine .txt Datei ist. Dieser Vorgang wird in Abschnitt "[Importbefehle für unterschiedliche Dateitypen]" ausführlich beschrieben. Hinzu kommt hier nur noch das Zwischenspeichern der Datei, da diese auch für eine andere Komponente benötigt wird und so das doppelte Importieren vermieden wird.
+In diesem Beispiel wird für eine Komponente nur ein Einzelteil eingelesen. Welche Einzelteile für welche Komponenten benötigt werden ist aus der Auflistung im Abschnitt "[Importieren der Daten]" zu entnehmen. In dem Fall von mehreren Einzelteilen pro Komponente erfolgt das Importieren und Einbinden analog. 
 ```
 Einzelteil_T01_str <- readLines(paste(".\\Data\\Einzelteil\\Einzelteil_T01.txt"), warn=FALSE)
 Einzelteil_T01_str <- str_replace_all(Einzelteil_T01_str, "[|]", "")
@@ -265,13 +273,23 @@ Komponente_K1BE1 <- Komponente_K1BE1 %>%
   bind_rows(list(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04))
 ```
 
-11. Danach werden alle ursprünglichen Dateien gelöscht welche jetzt sortiert und aufgearbeitet in der finalen Tabelle als Kopie vorhanden sind. Um Arbeitsspeicher einzusparen und da diese nicht mehr benötigt werden.
+11. Danach werden alle ursprünglichen Dateien gelöscht, welche jetzt sortiert und aufgearbeitet in der finalen Tabelle als Kopie vorhanden sind, um Arbeitsspeicher einzusparen und da diese nicht mehr benötigt werden.
 ```
 rm(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04, Bestandteile_Komponente_K1BE1)
 ```
 
-12. Abschließend wird Schritt 1 bis 11 für alle Komponenten und Einzelteile aus der Auflistung im Abschnitt "[Importieren der Daten]" wiederholt.
+12. Anschließend wird Schritt 1 bis 11 für alle Komponenten und Einzelteile aus der Auflistung im Abschnitt "[Importieren der Daten]" wiederholt.
 
+13. Nun werden alle Tabelle, welche in Schritt 1 - 11 erstellt wurden, hintereinander in eine neue Tabelle zusammengefügt.
+```
+result <- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, Komponente_K2ST1, 
+                          Komponente_K3AG1, Komponente_K3SG1, Komponente_K4)) #%>%
+```
+
+14. Abschließend wird die finale Tabelle als .csv Datei gespeichert.
+```
+write_csv(result, "Final_Data_Group11.csv")
+```
 
 # Für Vera und Minh
 Folgende Gliederungspunkte sollen im Inhaltsverzeichnis mindestens aufgeführt werden:

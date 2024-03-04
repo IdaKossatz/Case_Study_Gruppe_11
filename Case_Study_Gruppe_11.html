@@ -9,9 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Ida Kossatz" />
+<meta name="author" content="Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684), Alik Aylarov (389982), Ange Adissin (455022)" />
 
-<meta name="date" content="2024-02-23" />
+<meta name="date" content="2024-03-04" />
 
 <title>Case Study Gruppe 11</title>
 
@@ -1481,17 +1481,20 @@ font-size: 0.95em;
 
 
 <h1 class="title toc-ignore">Case Study Gruppe 11</h1>
-<h4 class="author">Ida Kossatz</h4>
-<h4 class="date">2024-02-23</h4>
+<h4 class="author">Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna
+Vera Wagner (453684), Alik Aylarov (389982), Ange Adissin (455022)</h4>
+<h4 class="date">2024-03-04</h4>
 
 </div>
 
 
+<p>In diesem Dokument werden die Schritte und Abläufe der
+Case_Study_App_Gruppe_11.R Datei beschrieben und erklärt.</p>
 <div id="vorbereiten-der-programmierumgebung" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Vorbereiten der
 Programmierumgebung</h1>
 <p>Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu
-können., wird das Tidyverse Package installiert und die Packages readr,
+können, wird das Tidyverse Package installiert und die Packages readr,
 dplyr, tidyr und stringr geladen.</p>
 <pre><code>install.packages(&quot;tidyverse&quot;)
 library(readr)
@@ -1503,19 +1506,21 @@ library(stringr)</code></pre>
 <h1><span class="header-section-number">2</span> Importieren der
 Daten</h1>
 <p>Um die Case Study bearbeiten zu können wurden folgende Datensätze
-wurden importiert. Dabei sind die Einzeldateien zugehörig zu ihren
-jeweiligen Komponenten aufgelistet. Sollten Daten aus den Einzelteile
-Tabellen für unterschiedliche Komponenten genutzt werden, so werden
-diese einmal beim ersten Aufruf importiert. Da für die Aufgabe
-Einzelteile und Komponenten aus dem Fahrzeug Typ 11 gebraucht werden,
-welches von der Firma OEM1 gebaut wird, werden anhand der ersten drei
-Tabellen die restlichen benötigten Dateien rausgesucht.</p>
+importiert. Dabei sind die Einzelteile zugehörig zu ihren jeweiligen
+Komponenten aufgelistet. Sollten Daten aus den Einzelteile Tabellen für
+unterschiedliche Komponenten genutzt werden, so werden diese einmalig
+beim ersten Aufruf importiert. Da für die Aufgabe Einzelteile und
+Komponenten aus dem Fahrzeug Typ 11, gebaut von der Firma OEM1, gefragt
+sind, werden anhand der ersten drei Tabellen sowie der jeweiligen
+Bestandteile_Komponente_KomponentenID Tabellen die restlichen benötigten
+Dateien rausgesucht.</p>
 <ul>
 <li>Fahrzeuge_OEM1_Typ11</li>
 <li>Bestandteile_Fahrzeuge_OEM1_Typ11</li>
 <li>Fahrzeuge_OEM1_Typ11_Fehleranalyse</li>
 <li>Komponente_K1BE1
 <ul>
+<li>Bestandteile_Komponente_K1BE1</li>
 <li>Einzelteil_T01</li>
 <li>Einzelteil_T02</li>
 <li>Einzelteil_T03</li>
@@ -1523,33 +1528,39 @@ Tabellen die restlichen benötigten Dateien rausgesucht.</p>
 </ul></li>
 <li>Komponente_K1DI1
 <ul>
+<li>Bestandteile_Komponente_K1DI1</li>
 <li>Einzelteil_T05</li>
 <li>Einzelteil_T06</li>
 </ul></li>
 <li>Komponente_K2LE1
 <ul>
+<li>Bestandteile_Komponente_K2LE1</li>
 <li>Einzelteil_T11</li>
 <li>Einzelteil_T14</li>
 <li>Einzelteil_T15</li>
 </ul></li>
 <li>Komponente_K2ST1
 <ul>
+<li>Bestandteile_Komponente_K2ST1</li>
 <li>Einzelteil_T12</li>
 <li>Einzelteil_T13</li>
 </ul></li>
 <li>Komponente_K3AG1
 <ul>
+<li>Bestandteile_Komponente_K3AG1</li>
 <li>Einzelteil_T21</li>
 <li>Einzelteil_T24</li>
 <li>Einzelteil_T25</li>
 </ul></li>
 <li>Komponente_K3SG1
 <ul>
+<li>Bestandteile_Komponente_K3SG1</li>
 <li>Einzelteil_T22</li>
 <li>Einzelteil_T23</li>
 </ul></li>
 <li>Komponente_K4
 <ul>
+<li>Bestandteile-Komponente_K4</li>
 <li>Einzelteil_T30</li>
 <li>Einzelteil_T31</li>
 <li>Einzelteil_T32</li>
@@ -1564,7 +1575,7 @@ Funktionen für unterschiedliche Dateitypen</h2>
 Beispielen aus dem Originalcode gezeigt.</p>
 <div id="csv" class="section level3" number="2.1.1">
 <h3><span class="header-section-number">2.1.1</span> .csv</h3>
-<p>CSV Dateien bei welcher die Spalten mit einem Komma separiert sind
+<p>CSV Dateien bei welcher die Spalten mit einem Komma separiert sind,
 werden wie folgt importiert. In diesem Fall wird die Datei Fahrzeuge OEM
 Typ 11 als Beispiel genutzt.</p>
 <pre><code>Fahrzeuge_OEM1_Typ11 &lt;- read_csv(&quot;.\\Data\\Fahrzeug\\Fahrzeuge_OEM1_Typ11.csv&quot;)</code></pre>
@@ -1578,7 +1589,8 @@ Tabelle Bestandteile Fahrzeuge OEM1 Typ11 als Beispiel genutzt.</p>
 <h3><span class="header-section-number">2.1.2</span> .txt einzeilig</h3>
 <p>Einzeilige Text (.txt) Dateien werden zuerst als String eingelesen.
 Anschließend werden die Spalten Delimiter mit <code>\t</code> ersetzt
-und die Zeilen Delimiter mit <code>\n</code>.</p>
+und die Zeilen Delimiter mit <code>\n</code>. In diesem Fall wird die
+Datei Einzelteil_T01.txt als Beispiel genutzt.</p>
 <pre><code>Einzelteil_T01_str &lt;- readLines(paste(&quot;.\\Data\\Einzelteil\\Einzelteil_T01.txt&quot;), warn=FALSE)
 Einzelteil_T01_str &lt;- str_replace_all(Einzelteil_T01_str, &quot;[|]&quot;, &quot;&quot;)
 Einzelteil_T01_str &lt;- str_replace_all(Einzelteil_T01_str, &quot;[[:space:]]{3}&quot;, &quot;\t&quot;)
@@ -1604,7 +1616,9 @@ vorhergehenden Schritt als Variable gespeichert.</p>
 mehrzeilig</h3>
 <p>Da R bei mehrzeiligen .txt Dateien den Zeilenumbruch erkennt, muss
 nur der Spaltenumbruch festgelegt werden. Auch hier werden die
-Spaltennamen für einheitliches Arbeiten eigenständig festgelegt.</p>
+Spaltennamen für einheitliches Arbeiten eigenständig festgelegt. In
+diesem Fall wird die Datei Komponente_k2ST1.txt als Beispiel
+genutzt.</p>
 <pre><code>Komponente_K2ST1 &lt;- read_delim(&quot;.\\Data\\Komponente\\Komponente_K2ST1.txt&quot;, delim=&quot;|&quot;,
                                col_names = c(&quot;ID&quot;, &quot;X1&quot;, &quot;ID_Sitze&quot;, &quot;Produktionsdatum&quot;, 
                                &quot;Herstellernummer&quot;, &quot;Werksnummer&quot;, &quot;Fehlerhaft&quot;, 
@@ -1615,34 +1629,35 @@ Spaltennamen für einheitliches Arbeiten eigenständig festgelegt.</p>
 </div>
 <div id="datenaufbereitung" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Datenaufbereitung</h1>
-<div id="anpassung-und-verbinden-von-tabellen" class="section level2" number="3.1">
-<h2><span class="header-section-number">3.1</span> Anpassung und
-Verbinden von Tabellen</h2>
+<div id="anpassen-und-verbinden-von-tabellen-mithilfe-von-funktionen" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Anpassen und
+Verbinden von Tabellen mithilfe von Funktionen</h2>
 <p>Da abschließend eine Tabelle mit allen benötigten Daten erstellt
 werden soll, müssen die benötigten Tabellen sortiert, gereinigt und
-miteinander verbunden werden. Diese Befehle werden für so gut wie jede
-Tabelle genutzt, deshalb bietet es sich an dies durch Funktionen zu
-definieren, welche dann nur noch aufgerufen werden müssen. Dabei werden
-innerhalb der Funktion auch einzelne Spalten manipuliert und fehlerhafte
-Daten aussortiert um anschließend einen sortierten Datensatz zu
-erhalten. Die finale Tabelle soll aus allen benötigten Komponenten und
-Einzelteilen folgende Spalten beinhalten:</p>
+miteinander verbunden werden. Diese Befehle werden für jede Tabelle
+genutzt, deshalb bietet es sich an dies durch Funktionen zu definieren,
+welche dann nur noch aufgerufen werden müssen. Dabei werden innerhalb
+der Funktion auch einzelne Spalten manipuliert und fehlerhafte Daten
+aussortiert um anschließend einen sortierten Datensatz zu erhalten. Die
+finale Tabelle soll aus allen benötigten Komponenten und Einzelteilen
+folgende Spalten beinhalten:</p>
 <ul>
 <li>Fehlerhafte Fahrleistung</li>
 <li>Betriebsdauer</li>
 <li>Herstellernummer</li>
-<li>ID Self</li>
-<li>ID Parent</li>
+<li>ID-Self</li>
+<li>ID-Parent</li>
 <li>Lieferdauer</li>
 <li>Produktionsdatum</li>
 </ul>
 <p>ID-Self beinhaltet dabei die ID des Einzelteils oder der Komponente
-und ID-Parent beschreibt die bei Einzelteilen die ID der dazugehörigen
+und ID-Parent beschreibt bei Einzelteilen die ID der dazugehörigen
 Komponente, sowie bei Komponenten die dazugehörigen ID des Fahrzeugs. Es
 wäre möglich diese zwei Attribute in eine Spalte mit eine Namen wie z.B.
-ID einzusortieren, da jeweils nur die Komponenten ID wirklich relevante
+ID einzusortieren, da jeweils nur die Komponenten ID wirklich relevant
 ist, jedoch ist es übersichtlicher und leichter verständlich wenn beide
-Attribute in separaten Spalten beibehalten werden.</p>
+Attribute in separaten Spalten beibehalten werden. Die jeweiligen IDs
+sind für das Plotten der geforderten Graphen relevant.</p>
 <div id="funktionen-zum-verbinden-von-tabellen" class="section level3 tabset" number="3.1.1">
 <h3 class="tabset"><span class="header-section-number">3.1.1</span>
 Funktionen zum Verbinden von Tabellen</h3>
@@ -1704,18 +1719,19 @@ einheitliche Namensgebung zu gewährleisten.</p>
 und Speichern der Einzelteile und der Komponenten (Teil 1)</h2>
 <p>Zunächst wird der Ablauf beschreiben, welcher den Import, das
 Anpassen mit den oben beschriebenen Funktionen und das finale Speichern
-als Variable durchführt. Dies ist für jede Komponente annähernd
-identisch und wird deshalb nur anhand einer Komponente beispielhaft
-beschrieben. In diesem Fall Komponente K1BE1.</p>
+als Variable ausführt. Dies ist für jedes Einzelteil bzw. jede
+Komponente annähernd identisch und wird deshalb nur anhand einer
+Komponente beispielhaft beschrieben. In diesem Fall Komponente
+K1BE1.</p>
 <ol style="list-style-type: decimal">
 <li>Einlesen der Datei mit Hilfe der oben beschriebenen <a href="#import-funktionen-für-unterschiedliche-dateitypen">Import
 Funktionen für unterschiedliche Dateitypen</a> .</li>
 </ol>
 <pre><code>Komponente_K1BE1 &lt;- read_csv(&quot;.\\Data\\Komponente\\Komponente_K1BE1.csv&quot;)</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li>Gegebenenfalls Anpassen der Tabelle, so dass alle Spalten den
-gleichen Namen tragen und den richtigen Dateityp haben. Das ist wichtig,
-damit die “Transform” Funktionen funktionieren.</li>
+<li>Gegebenenfalls Anpassen der Tabelle, so dass die Spalten jeder
+Komponenten- bzw. Einzelteiltabelle uniforme Namen und Datentypen haben.
+Das ist wichtig, damit die “Transform” Funktionen funktionieren.</li>
 </ol>
 <pre><code>Komponente_K1BE1 &lt;- Komponente_K1BE1 %&gt;%
   mutate(Produktionsdatum = as.Date(Produktionsdatum_Origin_01011970)) %&gt;%
@@ -1741,11 +1757,11 @@ Komponente Tabelle, um die Einzelteile zuordnen zu können.</li>
 Datei ist. Dieser Vorgang wird in Abschnitt “[Importbefehle für
 unterschiedliche Dateitypen]” ausführlich beschrieben. Hinzu kommt hier
 nur noch das Zwischenspeichern der Datei, da diese auch für eine andere
-Komponente benötigt wird und so das doppelte importieren vermieden wird.
+Komponente benötigt wird und so das doppelte Importieren vermieden wird.
 In diesem Beispiel wird für eine Komponente nur ein Einzelteil
 eingelesen. Welche Einzelteile für welche Komponenten benötigt werden
 ist aus der Auflistung im Abschnitt “<a href="#importieren-der-daten">Importieren der Daten</a>” zu entnehmen.
-In dem Fall von mehreren Einzelteil pro Komponente erfolgt das
+In dem Fall von mehreren Einzelteilen pro Komponente erfolgt das
 Importieren und Einbinden analog.</li>
 </ol>
 <pre><code>Einzelteil_T01_str &lt;- readLines(paste(&quot;.\\Data\\Einzelteil\\Einzelteil_T01.txt&quot;), warn=FALSE)
@@ -1796,6 +1812,8 @@ Datensatzes</h1>
 <div id="importieren-anpassen-und-speichern-der-einzelteile-und-der-komponenten-teil-2" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Importieren, Anpassen
 und Speichern der Einzelteile und der Komponenten (Teil 2)</h2>
+<p>In diesem Abschnitt wird beschrieben wie die Tabellen für Einzelteile
+und Komponenten in der finalen Tabelle zusammengefügt werden.</p>
 <ol start="10" style="list-style-type: decimal">
 <li>Zusammenfügen aller Einzelteile in die Tabelle der Komponente. Dabei
 werden nur die Spalten ausgewählt welche für den weiteren Verlauf
@@ -1808,18 +1826,38 @@ dabei die Tabellen übereinander ein.</li>
            ID_Parent, Lieferdauer, Produktionsdatum)) %&gt;%
   bind_rows(list(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04))</code></pre>
 <ol start="11" style="list-style-type: decimal">
-<li>Danach werden alle ursprünglichen Dateien gelöscht welche jetzt
+<li>Danach werden alle ursprünglichen Dateien gelöscht, welche jetzt
 sortiert und aufgearbeitet in der finalen Tabelle als Kopie vorhanden
-sind. Um Arbeitsspeicher einzusparen und da diese nicht mehr benötigt
+sind, um Arbeitsspeicher einzusparen und da diese nicht mehr benötigt
 werden.</li>
 </ol>
 <pre><code>rm(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04, Bestandteile_Komponente_K1BE1)</code></pre>
 <ol start="12" style="list-style-type: decimal">
-<li>Abschließend wird Schritt 1 bis 11 für alle Komponenten und
+<li><p>Anschließend wird Schritt 1 bis 11 für alle Komponenten und
 Einzelteile aus der Auflistung im Abschnitt “<a href="#importieren-der-daten">Importieren der Daten</a>”
-wiederholt.</li>
+wiederholt.</p></li>
+<li><p>Nun werden alle Tabelle, welche in Schritt 1 - 11 erstellt
+wurden, hintereinander in eine neue Tabelle zusammengefügt.</p></li>
 </ol>
+<pre><code>result &lt;- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, Komponente_K2ST1, 
+                          Komponente_K3AG1, Komponente_K3SG1, Komponente_K4)) #%&gt;%</code></pre>
+<ol start="14" style="list-style-type: decimal">
+<li>Abschließend wird die finale Tabelle als .csv Datei
+gespeichert.</li>
+</ol>
+<pre><code>write_csv(result, &quot;Final_Data_Group11.csv&quot;)</code></pre>
 </div>
+</div>
+<div id="für-vera-und-minh" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Für Vera und Minh</h1>
+<p>Folgende Gliederungspunkte sollen im Inhaltsverzeichnis mindestens
+aufgeführt werden:</p>
+</div>
+<div id="auswertung" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Auswertung</h1>
+</div>
+<div id="ergebnis" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Ergebnis</h1>
 </div>
 
 
