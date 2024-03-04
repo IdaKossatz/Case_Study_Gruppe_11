@@ -272,6 +272,7 @@ rm(Einzelteil_T01, Einzelteil_T02, Einzelteil_T03, Einzelteil_T04, Bestandteile_
 
 12. Abschließend wird Schritt 1 bis 11 für alle Komponenten und Einzelteile aus der Auflistung im Abschnitt "[Importieren der Daten]" wiederholt.
 
+
 # Für Vera und Minh
 Folgende Gliederungspunkte sollen im Inhaltsverzeichnis mindestens aufgeführt werden:
 
