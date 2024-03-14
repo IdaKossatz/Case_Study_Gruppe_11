@@ -1,7 +1,7 @@
 ---
 title: Allgemeine Aufgaben Gruppe 11
 author: Alik Aylarov (389982), Ange Adissin (455022), Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684)
-date: '04-03-2024'
+date: '2024-03-04'
 output:
   html_document:
     toc: true

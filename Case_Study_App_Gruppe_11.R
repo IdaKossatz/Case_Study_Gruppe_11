@@ -1,4 +1,4 @@
-#install.packages("tidyverse")
+install.packages("tidyverse")
 library(readr) # fuer read_csv, read_delim, readLines
 library(dplyr) # fuer daten aufarbeitung, joins, etc
 library(tidyr) # drop_na, Datenreinigung

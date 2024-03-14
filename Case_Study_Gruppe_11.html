@@ -1489,7 +1489,13 @@ Vera Wagner (453684), Alik Aylarov (389982), Ange Adissin (455022)</h4>
 
 
 <p>In diesem Dokument werden die Schritte und Abläufe der
-Case_Study_App_Gruppe_11.R Datei beschrieben und erklärt.</p>
+Case_Study_App_Gruppe_11.R Datei beschrieben und erklärt. Die Themen
+Vorbereiten der Programmierumgebung, Importieren der Daten,
+Datenaufbereitung und Erstellen des finalen Datensatzes wurden von Ida
+Kossatz bearbeitet und implementiert. Die Shiny App und die Themen
+Auswertung und Ergebnis wurden von Minh Ngoc Hoang bearbeitet. Die
+allgemeinen Aufgaben wurden von Alik Aylarov und Ange Adissin
+bearbeitet.</p>
 <div id="vorbereiten-der-programmierumgebung" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Vorbereiten der
 Programmierumgebung</h1>
@@ -1513,7 +1519,7 @@ beim ersten Aufruf importiert. Da für die Aufgabe Einzelteile und
 Komponenten aus dem Fahrzeug Typ 11, gebaut von der Firma OEM1, gefragt
 sind, werden anhand der ersten drei Tabellen sowie der jeweiligen
 Bestandteile_Komponente_KomponentenID Tabellen die restlichen benötigten
-Dateien rausgesucht.</p>
+Dateien herausgesucht.</p>
 <ul>
 <li>Fahrzeuge_OEM1_Typ11</li>
 <li>Bestandteile_Fahrzeuge_OEM1_Typ11</li>
@@ -1579,8 +1585,8 @@ Beispielen aus dem Originalcode gezeigt.</p>
 werden wie folgt importiert. In diesem Fall wird die Datei Fahrzeuge OEM
 Typ 11 als Beispiel genutzt.</p>
 <pre><code>Fahrzeuge_OEM1_Typ11 &lt;- read_csv(&quot;.\\Data\\Fahrzeug\\Fahrzeuge_OEM1_Typ11.csv&quot;)</code></pre>
-<p>CSV Dateien bei welcher die Spalten dagegen mit einem Semikolon
-separiert sind werden mit folgendem Befehl importiert. Hier wird die
+<p>CSV Dateien, bei welcher die Spalten dagegen mit einem Semikolon
+separiert sind, werden mit folgendem Befehl importiert. Hier wird die
 Tabelle Bestandteile Fahrzeuge OEM1 Typ11 als Beispiel genutzt.</p>
 <pre><code>Bestandteile_Fahrzeuge_OEM1_Typ11 &lt;- read_csv2(&quot;.\\Data\\Fahrzeug
                                                  \\Bestandteile_Fahrzeuge_OEM1_Typ11.csv &quot;)</code></pre>
@@ -1638,7 +1644,7 @@ miteinander verbunden werden. Diese Befehle werden für jede Tabelle
 genutzt, deshalb bietet es sich an dies durch Funktionen zu definieren,
 welche dann nur noch aufgerufen werden müssen. Dabei werden innerhalb
 der Funktion auch einzelne Spalten manipuliert und fehlerhafte Daten
-aussortiert um anschließend einen sortierten Datensatz zu erhalten. Die
+aussortiert, um anschließend einen sortierten Datensatz zu erhalten. Die
 finale Tabelle soll aus allen benötigten Komponenten und Einzelteilen
 folgende Spalten beinhalten:</p>
 <ul>
@@ -1652,12 +1658,13 @@ folgende Spalten beinhalten:</p>
 </ul>
 <p>ID-Self beinhaltet dabei die ID des Einzelteils oder der Komponente
 und ID-Parent beschreibt bei Einzelteilen die ID der dazugehörigen
-Komponente, sowie bei Komponenten die dazugehörigen ID des Fahrzeugs. Es
-wäre möglich diese zwei Attribute in eine Spalte mit eine Namen wie z.B.
-ID einzusortieren, da jeweils nur die Komponenten ID wirklich relevant
-ist, jedoch ist es übersichtlicher und leichter verständlich wenn beide
-Attribute in separaten Spalten beibehalten werden. Die jeweiligen IDs
-sind für das Plotten der geforderten Graphen relevant.</p>
+Komponente, sowie bei Komponenten die dazugehörige ID des Fahrzeugs. Es
+wäre möglich diese zwei Attribute in eine Spalte mit einem Namen wie
+z.B. ID einzusortieren, da jeweils nur die Komponenten ID wirklich
+relevant ist, jedoch ist es übersichtlicher und leichter verständlich,
+wenn beide Attribute in separaten Spalten beibehalten werden. Die
+jeweiligen IDs sind für das Plotten der geforderten Graphen
+relevant.</p>
 <div id="funktionen-zum-verbinden-von-tabellen" class="section level3 tabset" number="3.1.1">
 <h3 class="tabset"><span class="header-section-number">3.1.1</span>
 Funktionen zum Verbinden von Tabellen</h3>
@@ -1676,7 +1683,7 @@ aussortiert. Um die benötigte Angabe Lieferdauer zu erstellen werden für
 jeden Zeileneintrag das Produktionsdatum des Fahrzeuges abgezogen dem
 Produktionsdatum der Komponente berechnet und als Spalte mit dem Namen
 Lieferdauer der Tabelle hinzugefügt. Danach werden die final benötigten
-Spalten selektiert und namentlich gegebenenfalls angepasst um eine
+Spalten selektiert und namentlich gegebenenfalls angepasst, um eine
 einheitliche Namensgebung zu gewährleisten.</p>
 <pre><code>Komponente_Transform &lt;- function (Komponente, Join = &quot;&quot;){
   Komponente &lt;- Komponente %&gt;%
@@ -1700,7 +1707,7 @@ aussortiert. Um die benötigte Angabe Lieferdauer zu erstellen werden für
 jeden Zeileneintrag das Produktionsdatum der Komponente abgezogen dem
 Produktionsdatum des Einzelteils berechnet und als Spalte mit dem Namen
 Lieferdauer der Tabelle hinzugefügt. Danach werden die final benötigten
-Spalten selektiert und namentlich gegebenenfalls angepasst um eine
+Spalten selektiert und namentlich gegebenenfalls angepasst, um eine
 einheitliche Namensgebung zu gewährleisten.</p>
 <pre><code>Einzelteil_Transform &lt;- function(Teil, Komponente, Join = &quot;&quot;){
   Teil &lt;- Teil %&gt;%
@@ -1724,12 +1731,12 @@ Komponente annähernd identisch und wird deshalb nur anhand einer
 Komponente beispielhaft beschrieben. In diesem Fall Komponente
 K1BE1.</p>
 <ol style="list-style-type: decimal">
-<li>Einlesen der Datei mit Hilfe der oben beschriebenen <a href="#import-funktionen-für-unterschiedliche-dateitypen">Import
+<li>Einlesen der Datei mithilfe der oben beschriebenen <a href="#import-funktionen-für-unterschiedliche-dateitypen">Import
 Funktionen für unterschiedliche Dateitypen</a> .</li>
 </ol>
 <pre><code>Komponente_K1BE1 &lt;- read_csv(&quot;.\\Data\\Komponente\\Komponente_K1BE1.csv&quot;)</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li>Gegebenenfalls Anpassen der Tabelle, so dass die Spalten jeder
+<li>Gegebenenfalls Anpassen der Tabelle, sodass die Spalten jeder
 Komponenten- bzw. Einzelteiltabelle uniforme Namen und Datentypen haben.
 Das ist wichtig, damit die “Transform” Funktionen funktionieren.</li>
 </ol>
@@ -1737,7 +1744,7 @@ Das ist wichtig, damit die “Transform” Funktionen funktionieren.</li>
   mutate(Produktionsdatum = as.Date(Produktionsdatum_Origin_01011970)) %&gt;%
   select(c(Fehlerhaft_Fahrleistung, Fehlerhaft_Datum, Herstellernummer, ID_Motor, Produktionsdatum))</code></pre>
 <ol start="3" style="list-style-type: decimal">
-<li>Die “[Transform” Funktion für Komponenten] wird aufgerufen, mit den
+<li>Die “[Transform” Funktion für Komponenten]” wird aufgerufen, mit den
 dazugehörigen Argumenten.</li>
 </ol>
 <pre><code>Komponente_K1BE1 &lt;- Komponente_Transform(Komponente_K1BE1, &quot;ID_Motor&quot;)</code></pre>
@@ -1762,7 +1769,8 @@ In diesem Beispiel wird für eine Komponente nur ein Einzelteil
 eingelesen. Welche Einzelteile für welche Komponenten benötigt werden
 ist aus der Auflistung im Abschnitt “<a href="#importieren-der-daten">Importieren der Daten</a>” zu entnehmen.
 In dem Fall von mehreren Einzelteilen pro Komponente erfolgt das
-Importieren und Einbinden analog.</li>
+Importieren und Einbinden analog. Danach werden der String und das
+“temporary file” (tf) gelöscht um RAM freizugeben.</li>
 </ol>
 <pre><code>Einzelteil_T01_str &lt;- readLines(paste(&quot;.\\Data\\Einzelteil\\Einzelteil_T01.txt&quot;), warn=FALSE)
 Einzelteil_T01_str &lt;- str_replace_all(Einzelteil_T01_str, &quot;[|]&quot;, &quot;&quot;)
@@ -1816,8 +1824,8 @@ und Speichern der Einzelteile und der Komponenten (Teil 2)</h2>
 und Komponenten in der finalen Tabelle zusammengefügt werden.</p>
 <ol start="10" style="list-style-type: decimal">
 <li>Zusammenfügen aller Einzelteile in die Tabelle der Komponente. Dabei
-werden nur die Spalten ausgewählt welche für den weiteren Verlauf
-wichtig sind. Somit werden die Spalten weggelassen welche nur für das
+werden nur die Spalten ausgewählt, welche für den weiteren Verlauf
+wichtig sind. Somit werden die Spalten weggelassen, welche nur für das
 Verknüpfen der Tabellen relevant waren. Die Funktion bind_rows() fügt
 dabei die Tabellen übereinander ein.</li>
 </ol>
@@ -1836,7 +1844,7 @@ werden.</li>
 <li><p>Anschließend wird Schritt 1 bis 11 für alle Komponenten und
 Einzelteile aus der Auflistung im Abschnitt “<a href="#importieren-der-daten">Importieren der Daten</a>”
 wiederholt.</p></li>
-<li><p>Nun werden alle Tabelle, welche in Schritt 1 - 11 erstellt
+<li><p>Nun werden alle Tabellen, welche in Schritt 1 - 12 erstellt
 wurden, hintereinander in eine neue Tabelle zusammengefügt.</p></li>
 </ol>
 <pre><code>result &lt;- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, Komponente_K2ST1, 

@@ -20,6 +20,10 @@ output:
 library(yaml)
 ```
 In diesem Dokument werden die Schritte und Abläufe der Case_Study_App_Gruppe_11.R Datei beschrieben und erklärt.
+Die Themen Vorbereiten der Programmierumgebung, Importieren der Daten, Datenaufbereitung und Erstellen des finalen Datensatzes
+wurden von Ida Kossatz bearbeitet und implementiert.
+Die Shiny App und die Themen Auswertung und Ergebnis wurden von Minh Ngoc Hoang bearbeitet.
+Die allgemeinen Aufgaben wurden von Alik Aylarov und Ange Adissin bearbeitet.
 
 # Vorbereiten der Programmierumgebung
 Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können, wird das Tidyverse Package installiert und die Packages readr, dplyr, tidyr und stringr geladen.
