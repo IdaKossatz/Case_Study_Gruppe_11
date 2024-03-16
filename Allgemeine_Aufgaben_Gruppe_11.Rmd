@@ -1,7 +1,7 @@
 ---
-title: Allgemeine Aufgaben Gruppe 11
+title: "Allgemeine Aufgaben Gruppe 11"
 author: Alik Aylarov (389982), Ange Adissin (455022), Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684)
-date: '2024-03-04'
+date: "15.03.2024"
 output:
   html_document:
     toc: true
@@ -9,39 +9,54 @@ output:
     toc_float:
       collapsed: false
       smooth_scroll: false
-    number_sections: true
     theme: spacelab
-    highlight: espresso
+    highlight: default
       
 ---
-```{r setup, include=FALSE}
-# install.packages("yaml")
 
-library(yaml)
+
+Vorbereiten der Programmierumgebung um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das dplyr Package installiert und die Packages lubridate, ggplot2, knitr und stringr geladen.
+
+Überprüfen und installieren von benötigten Paketen
+```{r}
+if (!require(install.load)) {
+  install.packages("install.load")
+}
+if (!require(dplyr)) {
+  install.packages("dplyr")
+}
+if (!require(lubridate)) {
+  install.packages("lubridate")
+}
+if (!require(ggplot2)) {
+  install.packages("ggplot2")
+}
+if (!require(stringr)) {
+  install.packages("stringr")
+}
+if (!require(knitr)) {
+  install.packages("knitr")
+}
+if (!require(magrittr)) {
+  install.packages("magrittr")
+}
 ```
 
-Vorbereiten der Programmierumgebung
-Um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das dplyr Package installiert und die Packages lubridate, ggplot2, knitr und stringr geladen.
+## Aufgabe 1
 
-```{r}
-# install.packages("dplyr")
-# install.packages("lubridate")
-# install.packages("ggplot2")
-# install.packages("stringr")
-# install.packages("knitr")
-
+```{r} 
+# Laden der erforderlichen Pakete
 library(dplyr)
 library(lubridate)
-library(ggplot2)
 ```
 
-# Aufgabe 1
-Zunächst müssen zwei Excel-Dokumente eingelesen werden, um sie für weitere Berechnungen zu einem Dokument zusammenzufassen. 
+Zunächst müssen zwei CSV-Dateien eingelesen werden, um sie für weitere Berechnungen zu einem Datenrahmen zusammenzufassen.
 ```{r}
-komponente_k7 <- read.csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
-logistikverzug_k7 <- read.csv(".\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
+komponente_k7 <- read.csv("C:\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
+logistikverzug_k7 <- read.csv("C:\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
 ```
-Zusammenführung der Datenrahmen anhand der IDNummer
+
+Zusammenführung der Dateien anhand der IDNummer
 ```{r}
 gesamt_df <- merge(komponente_k7, logistikverzug_k7, by.x="IDNummer", by.y="IDNummer")
 ```
@@ -54,42 +69,53 @@ gesamt_df$Wareneingang <- as.Date(gesamt_df$Wareneingang, format = "%d.%m.%Y")
 
 Berechnung des Logistikverzugs in Tagen (unter Berücksichtigung eines weiteren Tags für Versandvorbereitung). Angenommen wurde, dass vom Zeitpunkt der Produktion bis zur Übergabe der Waren an die Logistik ein Tag vergeht und ein weiterer Tag für die Vorbereitung der Waren für den Versand benötigt wird. Um den Versandtag zu berechnen, müssen also zwei Tage zum Tag der Produktion der Waren hinzugezählt werden.
 ```{r}
-gesamt_df <- gesamt_df %>%
-  mutate(Logistikverzug = as.numeric(difftime(Wareneingang, Produktionsdatum + days(2), units = "days")))  # Plus 2 Tage für Lieferungvorbereitung und Versandvorbereitung
+gesamt_df <- gesamt_df %>% 
+  mutate(Logistikverzug = as.numeric(difftime(Wareneingang, Produktionsdatum + days(2)), units = "days"))
+
 ```
 
-## Verteilung des Logistikverzugs
-Mit Hilfe der untenstehenden Graphs und den Durchschnitts-, Minimal- und Maximalwerten können wir einige Rückschlüsse auf die Verteilung des Logistikverzugs ziehen. Daraus können wir schließen, dass im Durchschnitt 3 Tage zwischen Warenausgang und Wareneingang vergehen. Obwohl dies für den Empfänger ein akzeptabler Wert ist, gibt es noch Optimierungsmöglichkeiten, denn es gibt zumindest einige Fälle, in denen der Logistikverzug 0 war und der Kunde seine Ware noch am selben Tag erhalten hat. Ein genauerer Blick auf die Verteilungsgrafiken des Logistikverzugs nach Quartalen gibt Aufschluss darüber, wie der durchschnittliche Logistikverzugswert nach Quartalen variiert und welche Verbesserungsmöglichkeiten bestehen. Im Jahr 2016 wies zum Beispiel Q2 die besten und Q4 die schlechtesten Werte auf. Dies deutet darauf hin, dass die Logistikrouten in kälteren Perioden optimiert werden müssen (z. B. durch bessere Transportmöglichkeiten oder die Bereitstellung von Winterreifen für Transportfahrzeuge im Voraus). 
 
-## min-max Berechnung
+## a. Verteilung des Logistikverzugs
+
+Mit Hilfe der untenstehenden Graphs und den Durchschnitts-, Minimal- und Maximalwerten können wir einige Rückschlüsse auf die Verteilung des Logistikverzugs ziehen. Daraus können wir schließen, dass im Durchschnitt 3 Tage zwischen Warenausgang und Wareneingang vergehen. Obwohl dies für den Empfänger ein akzeptabler Wert ist, gibt es noch Optimierungsmöglichkeiten, denn es gibt zumindest einige Fälle, in denen der Logistikverzug 0 war und der Kunde seine Ware noch am selben Tag erhalten hat. Ein genauerer Blick auf die Verteilungsgrafiken des Logistikverzugs nach Quartalen gibt Aufschluss darüber, wie der durchschnittliche Logistikverzugswert nach Quartalen variiert und welche Verbesserungsmöglichkeiten bestehen. Im Jahr 2016 wies zum Beispiel Q2 die besten und Q4 die schlechtesten Werte auf. Dies deutet darauf hin, dass die Logistikrouten in kälteren Perioden optimiert werden müssen (z. B. durch bessere Transportmöglichkeiten oder die Bereitstellung von Winterreifen für Transportfahrzeuge im Voraus).
+
+## b. Mindestens/Höchstens vergangene Zeit zwischen Warenausgang und Wareneingang
+
 Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```{r}
+```{r}     
 min_zeit <- min(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
+
 Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```{r}
+```{r}  
 max_zeit <- max(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Ausgabe der Ergebnisse
-```{r}
+```{r} 
 cat("Minimale Zeitunterschied zwischen Warenausgang und Wareneingang:", min_zeit, "Tage\n")
 cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit, "Tage\n")
 ```
+## c. Mittelwertsberechnung
 
-## Mittelwertsberechnung
 Mittelwert des Logistikverzugs berechnen
-```{r}
+```{r} 
 mittelwert_logistikverzug <- mean(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
+
+
 Ausgabe des Mittelwerts
-```{r}
+```{r} 
 cat("Mittelwert des Logistikverzugs:", mittelwert_logistikverzug, "Tage\n")
 ```
+## d. Darstellung der Verteilung in geeigneter Weise mit Plotly
+
 
 Histogramm des Logistikverzugs erstellen
 ```{r}
+# Laden der erforderlichen Pakete
+library(ggplot2)
 ggplot(gesamt_df, aes(x=Logistikverzug)) +
   geom_histogram(binwidth=1, fill="blue", color="black") +
   theme_minimal() +
@@ -97,138 +123,152 @@ ggplot(gesamt_df, aes(x=Logistikverzug)) +
        x="Logistikverzug (Tage)",
        y="Häufigkeit")
 ```
+
 Erstellen von Variablen für Jahr und Quartal
-```
+```{r}         
 gesamt_df$Jahr <- year(as.Date(gesamt_df$Wareneingang))  # Jahr aus dem Wareneingangsdatum extrahieren
 gesamt_df$Quartal <- quarter(as.Date(gesamt_df$Wareneingang))  # Quartal aus dem Wareneingangsdatum extrahieren
 ```
+
 Berechnung der durchschnittlichen Verzögerung pro Jahr und Quartal
-```
+```{r}         
 jahr_quartal_zusammenfassung <- gesamt_df %>%
   group_by(Jahr, Quartal) %>%
-  summarise(Durchschnittliche_Verzögerung = mean(Logistikverzug, na.rm = TRUE))
+  summarise(Durchschnittliche_Verzögerung = mean(Logistikverzug, na.rm = TRUE),
+            .groups = "drop")
+
 ```
+
 Berechnung der Gesamtdurchschnittswerte pro Quartal
-```
+```{r}         
 gesamt_mittelwerte <- jahr_quartal_zusammenfassung %>%
   group_by(Quartal) %>%
   summarise(Gesamtdurchschnitt = mean(Durchschnittliche_Verzögerung))
 ```
+
 Erstellen des Diagramms
-```
+```{r}         
 p <- ggplot(jahr_quartal_zusammenfassung, aes(x = Jahr, y = Durchschnittliche_Verzögerung, group = Quartal, color = factor(Quartal))) +
-  geom_line(size = 1.5) +  # Erhöhen der Linienstärke
-  geom_point(size = 3) +  # Erhöhen der Punktegröße
+  geom_line(linewidth = 1.5) +  # Verwenden von linewidth anstelle von size
+  geom_point(size = 3) +  # Beibehalten der Punktegröße
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(title = "Durchschnittliche Logistikverzögerung pro Quartal und Jahr für Komponente K7",
        x = "Jahr",
        y = "Durchschnittliche Verzögerung (Tage)",
        color = "Quartal")
+
 ```
+
 Hinzufügen von Annotationen mit den Gesamtdurchschnittswerten
-```
+```{r}         
 for(i in 1:nrow(gesamt_mittelwerte)) {
   p <- p + annotate("text", x = max(jahr_quartal_zusammenfassung$Jahr), y = gesamt_mittelwerte$Gesamtdurchschnitt[i], 
                     label = paste("Q", gesamt_mittelwerte$Quartal[i], ":", round(gesamt_mittelwerte$Gesamtdurchschnitt[i], 2), "Tage"), 
                     hjust = 1, vjust = -0.5)
 }
 ```
+
 Anzeigen des Diagramms
-```
+```{r}         
 print(p)      
-```             
+```
 
-# Aufgabe 2.
+## Aufgabe 2
 
-Es gibt mehrere Gründe, warum es sinnvoll ist, Daten in separaten Dateien abzulegen und nicht alles in einer riesigen Tabelle zu speichern:
+### Gründe Daten in separaten Dateien abzulegen und nicht alles in einer riesigen Tabelle zu speichern
 
-## Modularität und Skalierbarkeit: 
-Durch die Aufteilung der Daten in separate Dateien nach logischen Einheiten, wie z.B. Tabellen für verschiedene Entitäten oder Datenquellen, wird die Modularität erhöht. Dies erleichtert die Verwaltung, Aktualisierung und Skalierung der Datenbank, da Änderungen an einer Datei keine Auswirkungen auf andere haben. 
+### - Modularität und Skalierbarkeit:
 
-## Effizienz bei der Datenverwaltung: 
-Separate Dateien erleichtern das Organisieren und Verwalten von Daten, da jeder Datensatz oder jede Entität in einer eigenen Datei gespeichert ist. Dadurch wird die Datenverwaltung effizienter und Fehler bei der Datenmanipulation werden minimiert. 
+Durch die Aufteilung der Daten in separate Dateien nach logischen Einheiten, wie z.B. Tabellen für verschiedene Entitäten oder Datenquellen, wird die Modularität erhöht. Dies erleichtert die Verwaltung, Aktualisierung und Skalierung der Datenbank, da Änderungen an einer Datei keine Auswirkungen auf andere haben.
 
-## Verbesserte Datenintegrität: 
-Die Verwendung separater Dateien trägt zur Datenintegrität bei, da Daten in logisch zusammenhängenden Gruppen organisiert sind. Dies erleichtert die Durchsetzung von Integritätsregeln und die Vermeidung von Inkonsistenzen in den Daten. 
+### - Effizienz bei der Datenverwaltung:
 
-## Leistungsoptimierung: 
+Separate Dateien erleichtern das Organisieren und Verwalten von Daten, da jeder Datensatz oder jede Entität in einer eigenen Datei gespeichert ist. Dadurch wird die Datenverwaltung effizienter und Fehler bei der Datenmanipulation werden minimiert.
+
+### - Verbesserte Datenintegrität:
+
+Die Verwendung separater Dateien trägt zur Datenintegrität bei, da Daten in logisch zusammenhängenden Gruppen organisiert sind. Dies erleichtert die Durchsetzung von Integritätsregeln und die Vermeidung von Inkonsistenzen in den Daten.
+
+### - Leistungsoptimierung:
+
 Durch die Aufteilung der Daten in separate Dateien kann die Leistung optimiert werden. Beispielsweise können häufig abgerufene Daten in separaten Dateien gespeichert werden, um den Zugriff zu beschleunigen, während seltener benötigte Daten in weniger zugänglichen Dateien gespeichert werden können, um Speicherplatz zu sparen und die Leistung zu verbessern.
 
 Das zugrunde liegende Datenbankkonzept, bei dem Daten in separaten Dateien organisiert sind, wird als "File-based Database" oder "File System Database" bezeichnet. In diesem Ansatz werden Daten in Dateien auf dem Dateisystem gespeichert und organisiert, wobei jede Datei einer logisch zusammenhängenden Datenmenge entspricht.
 
 
-# Aufgabe 3.
-
-```
-if (!require("stringr")) install.packages("stringr")
-```
-Define and read the file
-```
-zulassungen_data <- read.csv("C:.\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
-```
-Filter rows where the column Gemeinden is 'WEHR' or other variations like WEHR1 etc.
-```
-wehr_data <- filter(zulassungen_data, str_detect(Gemeinden, "^WEHR\\d*$|^WEHR$"))
-```
-Get the IDNummer from the filtered data
-```
-wehr_ids <- wehr_data$IDNummer
-```
-Define the path to the second file
-```
-fahrzeug_data <- read.csv("C:.\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
-```
-Find matches in the second file
-```
-matched_fahrzeug <- fahrzeug_data[fahrzeug_data$ID_Fahrzeug %in% wehr_ids,]
-```
-Get the ID_Karosserie from the matched data
-```
-karosserie_ids <- matched_fahrzeug$ID_Karosserie
-```
-Define the path to the third file
-```
-komponente_data <- read.csv("C:.\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
-```
-Find matches in the third file
-```
-final_matches <- komponente_data[komponente_data$IDNummer %in% karosserie_ids,]
-```
-Count the matches
-```
-total_matches <- nrow(final_matches)
-```
-Concatenate the IDs of the found components into a single string with German text
-```
-gefundene_komponenten_string <- paste("Gefundene Komponenten IDs: ", paste(final_matches$IDNummer, collapse = ", "))
-```
-Print all found component IDs with the corresponding German text
-```
-print(gefundene_komponenten_string)
-```
-Output the total number of matches with German text
-```
-print(paste("Anzahl der in Wehr, Landkreis Waldshut zugelassenen Fahrzeuge mit Komponenten K7: ", total_matches))
-```
+## Aufgabe 3  
 
 
-# Aufgabe 4.
+```{r}
+# Ladung des Pakets stringr, falls noch nicht installiert
+if (!require("stringr")) {
+  install.packages("stringr")
+  library(stringr)
+}
+```
+
+Die Dateien erst einlesen
+```{r}
+zulassungsdatei <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+fahrzeugsdatei <- read.csv("C:\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+komponentendatei <- read.csv("C:\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
+```
+
+Fahrzeuge in Wehr bzw. Landkreis Waldshut finden
+```{r}
+wehr_datei <- zulassungsdatei[stringr::str_detect(zulassungsdatei$Gemeinden, "^WEHR\\d*$|^WEHR$"), ]
+wehr_id <- wehr_datei$IDNummer
+```
+
+Fahrzeuge in Wehr in der Bestandteilendatei  finden
+```{r}
+finde_fahrzeug <- fahrzeugsdatei[fahrzeugsdatei$ID_Fahrzeug %in% wehr_id, ]
+karosserie_id <- finde_fahrzeug$ID_Karosserie
+```
+
+Nun Komponenten K7 in den Bestandteilen finden
+```{r}
+suche_k7 <- komponentendatei[komponentendatei$IDNummer %in% karosserie_id, ]
+```
+
+Hier wird die Anzahl der Übereinstimmungen gezählt
+```{r}
+gesamt_anzahl <- nrow(suche_k7)
+```
+
+Ausgabe
+```{r}
+if (gesamt_anzahl > 0) {
+  cat("Die gefundenen Komponenten: ", paste(suche_k7$IDNummer, collapse = ", "), "\n")
+  cat("Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut: ", gesamt_anzahl, "\n")
+} else {
+  cat("Keine Komponenten K7 in Fahrzeugen, die in Wehr, Landkreis Waldshut zugelassen wurden, gefunden.\n")
+}
+
+```
+
+## Aufgabe 4
+
+### Datentypen, die die Attribute der Zulassungstabelle „Zulassungen_aller_Fahrzeuge“ haben
 
 Laden des knitr-Pakets
-```
+```{r}         
 library(knitr)
 ```
+
 Daten aus der CSV-Datei lesen
+```{r}         
+daten <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
-daten <- read.csv("C:.\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
-```
+
 Typen der Daten für jede Spalte bestimmen
-```
+```{r}         
 datentypen <- sapply(daten, class)
 ```
+
 Umwandlung der Datentypen in verständlichere Bezeichnungen
-```
+```{r}         
 datentypen <- gsub("integer", "Integer", datentypen)
 datentypen <- gsub("character", "String", datentypen)
 datentypen <- gsub("factor", "Faktor", datentypen)
@@ -236,81 +276,83 @@ datentypen <- gsub("numeric", "Numerisch", datentypen)
 datentypen <- gsub("logical", "Logisch", datentypen)
 datentypen <- gsub("Date", "Datum", datentypen)
 ```
+
 Erstellen einer Tabelle für die Ausgabe
-```
+```{r}         
 ausgabeDaten <- data.frame(Attribut = names(datentypen), Datentyp = datentypen, row.names = NULL)
 ```
+
 Ausgabe der Tabelle in einem schönen Format
-```
+```{r}         
 kable(ausgabeDaten, format = "markdown", col.names = c("Attribut", "Datentyp"), row.names = FALSE)
 ```
 
-Nach der Ausführung dieses Codes analysiert R jede Spalte und gibt den entsprechenden Attributtyp in einer Tabelle aus, die letztendlich wie folgt aussieht: 
 
+## Aufgabe 5
 
-<!-- |Attribut  |Datentyp | -->
-<!-- |:---------|:--------| -->
-<!-- |X         |Integer  | -->
-<!-- |IDNummer  |String   | -->
-<!-- |Gemeinden |String   | -->
-<!-- |Zulassung |String   | -->
+### Warum ist es gerade dann sinnvoll, die Datensätze auf der Datenbank eines Servers abzulegen?
 
+### - Zugänglichkeit und Flexibilität:
 
-
-# Aufgabe 5.
-
-## - Warum ist es gerade dann sinnvoll, die Datensätze auf der Datenbank eines Servers abzulegen?
-
-### Zugänglichkeit und Flexibilität: 
 Datenbanken auf Servern sind über das Netzwerk zugänglich, was es mehreren Benutzern ermöglicht, gleichzeitig auf die Daten zuzugreifen und sie zu bearbeiten. Dies erleichtert die Zusammenarbeit und fördert die Effizienz bei der Verwaltung von Daten.
 
-### Sicherheit und Backups:
+### - Sicherheit und Backups:
+
 Server-Datenbanken bieten oft erweiterte Sicherheitsmaßnahmen wie Zugriffssteuerung und regelmäßige Backups, um die Integrität der Daten zu gewährleisten. Auf einem persönlichen Computer besteht das Risiko von Datenverlust oder unbefugtem Zugriff, insbesondere wenn das Gerät nicht ausreichend geschützt ist.
 
-## -Warum können Sie die Datensätze nicht auf Ihrem persönlichen Computer ablegen?
+### Warum können Sie die Datensätze nicht auf Ihrem persönlichen Computer ablegen?
 
-### Begrenzte Ressourcen: 
+### - Begrenzte Ressourcen:
+
 Persönliche Computer haben begrenzte Speicher- und Verarbeitungskapazitäten im Vergleich zu Servern, die für den Einsatz in großen Netzwerken ausgelegt sind. Die Speicherung großer Datenmengen auf einem persönlichen Computer kann zu Leistungsproblemen und Einschränkungen bei der Skalierbarkeit führen.
 
-### Mangelnde Zugänglichkeit und Zusammenarbeit: 
+### - Mangelnde Zugänglichkeit und Zusammenarbeit:
+
 Wenn die Daten nur auf einem persönlichen Computer gespeichert sind, können sie nicht leicht von anderen Benutzern abgerufen oder gemeinsam bearbeitet werden. Dies kann die Zusammenarbeit erschweren und die Effizienz beeinträchtigen.
 
-## -Eine einfache Möglichkeit, eine Anwendung Ihrem Kundenkreis zugänglich zu machen?
+### Eine einfache Möglichkeit, die Applikation dem Kundenkreis zugänglich zu machen
 
-### Bereitstellung über das Internet: 
+### - Bereitstellung über das Internet:
+
 Durch Bereitstellung der Anwendung über das Internet können Benutzer von verschiedenen Standorten aus auf die Anwendung zugreifen, ohne dass sie zusätzliche Software installieren müssen. Dies erhöht die Benutzerfreundlichkeit und ermöglicht es einem breiteren Publikum, die Anwendung zu nutzen.
 
-### Cloud-Hosting: 
+### - Cloud-Hosting:
+
 Die Nutzung von Cloud-Diensten wie Heroku, AWS oder Azure erleichtert die Bereitstellung und Verwaltung der Anwendung, da sie eine skalierbare Infrastruktur und verschiedene Dienste zur Verfügung stellen, um den Betrieb der Anwendung zu unterstützen. Dies ermöglicht es Entwicklern, sich auf die Entwicklung der Anwendung zu konzentrieren, anstatt sich um die zugrunde liegende Infrastruktur kümmern zu müssen.
 
 
-# Aufgabe 6.
 
-Unter der Annahme, dass wir nur ID_Karosserie als Eingabe haben, sollten wir diese verwenden, um nach dem Fahrzeug selbst zu suchen. Da alle ID_Karosserien für die 7 Karosserien in der Tabelle Bestandteile_Fahrzeuge_OEM2_Typ22 gespeichert sind, können wir diese Tabelle durchsuchen, um das entsprechende ID_Fahrzeug zu finden. Nachdem wir diese Nummer gefunden haben, können wir leicht herausfinden, wo dieses Auto zugelassen war.
+## Aufgabe 6
+### Ort der Zulassung des Fahrzeuges mit der Karosseriebauteilnummer „K7-114-1142-31“
 
-Laden der Fahrzeugdaten
+Die Daten de Fahrzeuge werden erst geladen
+```{r}
+fahrzeug_daten <- read.csv("C:\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
 ```
-fahrzeug_data <- read.csv("C:.\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+
+Die Zulassungsdaten werden auch geladen
+```{r}
+zulassungen_daten <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
-Laden der Zulassungsdaten
+
+Hier wird die Fahrzeuge Karosserienummer gesucht
+```{r}
+suche_fahrzeuge <- dplyr::filter(fahrzeug_daten, ID_Karosserie == "K7-114-1142-31")
+fahrzeug_id <- suche_fahrzeuge$ID_Fahrzeug
 ```
-zulassungen_data <- read.csv("C:.\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+
+Suche nach der Stadt in der das Fahrzeug zugelassen ist
+```{r}
+findung_zulassungen <- zulassungen_daten[zulassungen_daten$IDNummer %in% fahrzeug_id,]
+zulassungsstadt <- findung_zulassungen$Gemeinden
 ```
-Finden der Fahrzeuge mit der spezifischen Karosserienummer
-```
-matching_fahrzeuge <- filter(fahrzeug_data, ID_Karosserie == "K7-114-1142-31")
-fahrzeug_ids <- matching_fahrzeuge$ID_Fahrzeug
-```
-Bestimmen der Zulassungsstadt basierend auf den Fahrzeug-IDs
-```
-matching_zulassungen <- zulassungen_data[zulassungen_data$IDNummer %in% fahrzeug_ids,]
-registration_cities <- matching_zulassungen$Gemeinden
-```
-Ausgabe der Zulassungsstadt mit einer erklärenden Nachricht
-```
-if (length(registration_cities) > 0) {
-  cat("Das Fahrzeug mit der Karosseriebauteilnummer 'K7-114-1142-31' wurde in folgenden Städten zugelassen:", paste(registration_cities, collapse=", "), ".\n")
+
+Ergebnis: Zulassungsstadt
+```{r}
+if (length(zulassungsstadt) > 0) {
+  cat("Das Fahrzeug wurde in", paste(zulassungsstadt, collapse=", "), "zugelassen.\n")
 } else {
-  cat("Keine Zulassungsdaten für das Fahrzeug mit der Karosseriebauteilnummer 'K7-114-1142-31' gefunden.\n")
+  cat("Keine Info zur Karroserienummer 'K7-114-1142-31' gefunden.\n")
 }
+
 ```
