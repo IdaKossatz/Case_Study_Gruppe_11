@@ -86,6 +86,8 @@ Mit Hilfe des untenstehenden Graphs und der Durchschnitts-, Minimal- und Maximal
 
 ## b. Mindestens/Höchstens vergangene Zeit zwischen Warenausgang und Wareneingang
 
+### Minimaler und Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang sind jeweils 0 und 11 Tage
+
 Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang
 ```     
 min_zeit <- min(gesamt_df$Logistikverzug, na.rm = TRUE)
@@ -103,6 +105,8 @@ cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit
 ```
 
 ## c. Mittelwertsberechnung
+
+### Der Mittelwert des Logistikverzugs ist 3.080437 Tage
 
 Mittelwert des Logistikverzugs berechnen
 ``` 
