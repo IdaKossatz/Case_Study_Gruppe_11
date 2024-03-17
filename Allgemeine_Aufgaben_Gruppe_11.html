@@ -1611,6 +1611,9 @@ Winterreifen für Transportfahrzeuge im Voraus).</p>
 <div id="b.-mindestenshöchstens-vergangene-zeit-zwischen-warenausgang-und-wareneingang" class="section level2">
 <h2>b. Mindestens/Höchstens vergangene Zeit zwischen Warenausgang und
 Wareneingang</h2>
+<div id="minimaler-und-maximaler-zeitunterschied-zwischen-warenausgang-und-wareneingang-sind-jeweils-0-und-11-tage" class="section level3">
+<h3>Minimaler und Maximaler Zeitunterschied zwischen Warenausgang und
+Wareneingang sind jeweils 0 und 11 Tage</h3>
 <p>Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang</p>
 <pre><code>min_zeit &lt;- min(gesamt_df$Logistikverzug, na.rm = TRUE)</code></pre>
 <p>Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang</p>
@@ -1619,12 +1622,16 @@ Wareneingang</h2>
 <pre><code>cat(&quot;Minimale Zeitunterschied zwischen Warenausgang und Wareneingang:&quot;, min_zeit, &quot;Tage\n&quot;)
 cat(&quot;Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:&quot;, max_zeit, &quot;Tage\n&quot;)</code></pre>
 </div>
+</div>
 <div id="c.-mittelwertsberechnung" class="section level2">
 <h2>c. Mittelwertsberechnung</h2>
+<div id="der-mittelwert-des-logistikverzugs-ist-3.080437-tage" class="section level3">
+<h3>Der Mittelwert des Logistikverzugs ist 3.080437 Tage</h3>
 <p>Mittelwert des Logistikverzugs berechnen</p>
 <pre><code>mittelwert_logistikverzug &lt;- mean(gesamt_df$Logistikverzug, na.rm = TRUE)</code></pre>
 <p>Ausgabe des Mittelwerts</p>
 <pre><code>cat(&quot;Mittelwert des Logistikverzugs:&quot;, mittelwert_logistikverzug, &quot;Tage\n&quot;)</code></pre>
+</div>
 </div>
 <div id="d.-darstellung-der-verteilung-in-geeigneter-weise-mit-plotly" class="section level2">
 <h2>d. Darstellung der Verteilung in geeigneter Weise mit Plotly</h2>
@@ -1679,7 +1686,7 @@ Quartal</p>
 riesigen Tabelle zu speichern</h3>
 </div>
 <div id="modularität-und-skalierbarkeit" class="section level3">
-<h3>- Modularität und Skalierbarkeit:</h3>
+<h3>- Modularität und Skalierbarkeit</h3>
 <p>Durch die Aufteilung der Daten in separate Dateien nach logischen
 Einheiten, wie z.B. Tabellen für verschiedene Entitäten oder
 Datenquellen, wird die Modularität erhöht. Dies erleichtert die
@@ -1687,21 +1694,21 @@ Verwaltung, Aktualisierung und Skalierung der Datenbank, da Änderungen
 an einer Datei keine Auswirkungen auf andere haben.</p>
 </div>
 <div id="effizienz-bei-der-datenverwaltung" class="section level3">
-<h3>- Effizienz bei der Datenverwaltung:</h3>
+<h3>- Effizienz bei der Datenverwaltung</h3>
 <p>Separate Dateien erleichtern das Organisieren und Verwalten von
 Daten, da jeder Datensatz oder jede Entität in einer eigenen Datei
 gespeichert ist. Dadurch wird die Datenverwaltung effizienter und Fehler
 bei der Datenmanipulation werden minimiert.</p>
 </div>
 <div id="verbesserte-datenintegrität" class="section level3">
-<h3>- Verbesserte Datenintegrität:</h3>
+<h3>- Verbesserte Datenintegrität</h3>
 <p>Die Verwendung separater Dateien trägt zur Datenintegrität bei, da
 Daten in logisch zusammenhängenden Gruppen organisiert sind. Dies
 erleichtert die Durchsetzung von Integritätsregeln und die Vermeidung
 von Inkonsistenzen in den Daten.</p>
 </div>
 <div id="leistungsoptimierung" class="section level3">
-<h3>- Leistungsoptimierung:</h3>
+<h3>- Leistungsoptimierung</h3>
 <p>Durch die Aufteilung der Daten in separate Dateien kann die Leistung
 optimiert werden. Beispielsweise können häufig abgerufene Daten in
 separaten Dateien gespeichert werden, um den Zugriff zu beschleunigen,
