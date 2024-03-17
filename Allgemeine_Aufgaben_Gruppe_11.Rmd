@@ -1,7 +1,8 @@
 ---
 title: "Allgemeine Aufgaben Gruppe 11"
-author: Alik Aylarov (389982), Ange Adissin (455022), Ida Kossatz (476046), Minh Ngoc Hoang (393166), Anna Vera Wagner (453684)
-date: "15.03.2024"
+author: Alik Aylarov (389982), Ange Adissin (455022), Ida Kossatz (476046), Minh Ngoc
+  Hoang (393166), Anna Vera Wagner (453684)
+date: "17-03-2024"
 output:
   html_document:
     toc: true
@@ -13,7 +14,11 @@ output:
     highlight: default
       
 ---
+```{r setup, include=FALSE}
+# install.packages("yaml")
 
+library(yaml)
+```
 
 Vorbereiten der Programmierumgebung um alle gewünschten Imports, Operationen und Anpassungen vornehmen zu können., wird das dplyr Package installiert und die Packages lubridate, ggplot2, knitr und stringr geladen.
 
@@ -44,31 +49,31 @@ if (!require(magrittr)) {
 
 ## Aufgabe 1
 
-```{r} 
-# Laden der erforderlichen Pakete
+Laden der erforderlichen Pakete 
+``` 
 library(dplyr)
 library(lubridate)
 ```
 
 Zunächst müssen zwei CSV-Dateien eingelesen werden, um sie für weitere Berechnungen zu einem Datenrahmen zusammenzufassen.
-```{r}
-komponente_k7 <- read.csv("C:\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
-logistikverzug_k7 <- read.csv("C:\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
+```
+komponente_k7 <- read_csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
+logistikverzug_k7 <- read_csv(".\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
 ```
 
 Zusammenführung der Dateien anhand der IDNummer
-```{r}
+```
 gesamt_df <- merge(komponente_k7, logistikverzug_k7, by.x="IDNummer", by.y="IDNummer")
 ```
 
 Datumsumwandlung für die Berechnung des Logistikverzugs
-```{r}
+```
 gesamt_df$Produktionsdatum <- as.Date(gesamt_df$Produktionsdatum, format = "%Y-%m-%d")
 gesamt_df$Wareneingang <- as.Date(gesamt_df$Wareneingang, format = "%d.%m.%Y")
 ```
 
 Berechnung des Logistikverzugs in Tagen (unter Berücksichtigung eines weiteren Tags für Versandvorbereitung). Angenommen wurde, dass vom Zeitpunkt der Produktion bis zur Übergabe der Waren an die Logistik ein Tag vergeht und ein weiterer Tag für die Vorbereitung der Waren für den Versand benötigt wird. Um den Versandtag zu berechnen, müssen also zwei Tage zum Tag der Produktion der Waren hinzugezählt werden.
-```{r}
+```
 gesamt_df <- gesamt_df %>% 
   mutate(Logistikverzug = as.numeric(difftime(Wareneingang, Produktionsdatum + days(2)), units = "days"))
 
@@ -77,45 +82,46 @@ gesamt_df <- gesamt_df %>%
 
 ## a. Verteilung des Logistikverzugs
 
-Mit Hilfe der untenstehenden Graphs und den Durchschnitts-, Minimal- und Maximalwerten können wir einige Rückschlüsse auf die Verteilung des Logistikverzugs ziehen. Daraus können wir schließen, dass im Durchschnitt 3 Tage zwischen Warenausgang und Wareneingang vergehen. Obwohl dies für den Empfänger ein akzeptabler Wert ist, gibt es noch Optimierungsmöglichkeiten, denn es gibt zumindest einige Fälle, in denen der Logistikverzug 0 war und der Kunde seine Ware noch am selben Tag erhalten hat. Ein genauerer Blick auf die Verteilungsgrafiken des Logistikverzugs nach Quartalen gibt Aufschluss darüber, wie der durchschnittliche Logistikverzugswert nach Quartalen variiert und welche Verbesserungsmöglichkeiten bestehen. Im Jahr 2016 wies zum Beispiel Q2 die besten und Q4 die schlechtesten Werte auf. Dies deutet darauf hin, dass die Logistikrouten in kälteren Perioden optimiert werden müssen (z. B. durch bessere Transportmöglichkeiten oder die Bereitstellung von Winterreifen für Transportfahrzeuge im Voraus).
+Mit Hilfe des untenstehenden Graphs und der Durchschnitts-, Minimal- und Maximalwerte können wir einige Rückschlüsse auf die Verteilung des Logistikverzugs ziehen. Daraus können wir schließen, dass im Durchschnitt 3 Tage zwischen Warenausgang und Wareneingang vergehen. Obwohl dies für den Empfänger ein akzeptabler Wert ist, gibt es noch Optimierungsmöglichkeiten, denn es gibt zumindest einige Fälle, in denen der Logistikverzug 0 war und der Kunde seine Ware noch am selben Tag erhalten hat. Ein genauerer Blick auf die Verteilungsgrafiken des Logistikverzugs nach Quartalen gibt Aufschluss darüber, wie der durchschnittliche Logistikverzugswert nach Quartalen variiert und welche Verbesserungsmöglichkeiten bestehen. Im Jahr 2016 wies zum Beispiel Q2 die besten und Q4 die schlechtesten Werte auf. Dies deutet darauf hin, dass die Logistikrouten in kälteren Perioden optimiert werden müssen (z. B. durch bessere Transportmöglichkeiten oder die Bereitstellung von Winterreifen für Transportfahrzeuge im Voraus).
 
 ## b. Mindestens/Höchstens vergangene Zeit zwischen Warenausgang und Wareneingang
 
 Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```{r}     
+```     
 min_zeit <- min(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
-
 Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```{r}  
+```  
 max_zeit <- max(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Ausgabe der Ergebnisse
-```{r} 
+```
 cat("Minimale Zeitunterschied zwischen Warenausgang und Wareneingang:", min_zeit, "Tage\n")
 cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit, "Tage\n")
 ```
+
 ## c. Mittelwertsberechnung
 
 Mittelwert des Logistikverzugs berechnen
-```{r} 
+``` 
 mittelwert_logistikverzug <- mean(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 
 Ausgabe des Mittelwerts
-```{r} 
+``` 
 cat("Mittelwert des Logistikverzugs:", mittelwert_logistikverzug, "Tage\n")
 ```
+
 ## d. Darstellung der Verteilung in geeigneter Weise mit Plotly
 
-
 Histogramm des Logistikverzugs erstellen
-```{r}
-# Laden der erforderlichen Pakete
+```
+# Laden des erforderlichen Pakets
 library(ggplot2)
+
 ggplot(gesamt_df, aes(x=Logistikverzug)) +
   geom_histogram(binwidth=1, fill="blue", color="black") +
   theme_minimal() +
@@ -125,13 +131,13 @@ ggplot(gesamt_df, aes(x=Logistikverzug)) +
 ```
 
 Erstellen von Variablen für Jahr und Quartal
-```{r}         
+```         
 gesamt_df$Jahr <- year(as.Date(gesamt_df$Wareneingang))  # Jahr aus dem Wareneingangsdatum extrahieren
 gesamt_df$Quartal <- quarter(as.Date(gesamt_df$Wareneingang))  # Quartal aus dem Wareneingangsdatum extrahieren
 ```
 
 Berechnung der durchschnittlichen Verzögerung pro Jahr und Quartal
-```{r}         
+```         
 jahr_quartal_zusammenfassung <- gesamt_df %>%
   group_by(Jahr, Quartal) %>%
   summarise(Durchschnittliche_Verzögerung = mean(Logistikverzug, na.rm = TRUE),
@@ -140,14 +146,14 @@ jahr_quartal_zusammenfassung <- gesamt_df %>%
 ```
 
 Berechnung der Gesamtdurchschnittswerte pro Quartal
-```{r}         
+```         
 gesamt_mittelwerte <- jahr_quartal_zusammenfassung %>%
   group_by(Quartal) %>%
   summarise(Gesamtdurchschnitt = mean(Durchschnittliche_Verzögerung))
 ```
 
 Erstellen des Diagramms
-```{r}         
+```         
 p <- ggplot(jahr_quartal_zusammenfassung, aes(x = Jahr, y = Durchschnittliche_Verzögerung, group = Quartal, color = factor(Quartal))) +
   geom_line(linewidth = 1.5) +  # Verwenden von linewidth anstelle von size
   geom_point(size = 3) +  # Beibehalten der Punktegröße
@@ -161,7 +167,7 @@ p <- ggplot(jahr_quartal_zusammenfassung, aes(x = Jahr, y = Durchschnittliche_Ve
 ```
 
 Hinzufügen von Annotationen mit den Gesamtdurchschnittswerten
-```{r}         
+```         
 for(i in 1:nrow(gesamt_mittelwerte)) {
   p <- p + annotate("text", x = max(jahr_quartal_zusammenfassung$Jahr), y = gesamt_mittelwerte$Gesamtdurchschnitt[i], 
                     label = paste("Q", gesamt_mittelwerte$Quartal[i], ":", round(gesamt_mittelwerte$Gesamtdurchschnitt[i], 2), "Tage"), 
@@ -170,7 +176,7 @@ for(i in 1:nrow(gesamt_mittelwerte)) {
 ```
 
 Anzeigen des Diagramms
-```{r}         
+```         
 print(p)      
 ```
 
@@ -199,8 +205,8 @@ Das zugrunde liegende Datenbankkonzept, bei dem Daten in separaten Dateien organ
 
 ## Aufgabe 3  
 
-
-```{r}
+### Die Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut ist 30
+```
 # Ladung des Pakets stringr, falls noch nicht installiert
 if (!require("stringr")) {
   install.packages("stringr")
@@ -209,36 +215,36 @@ if (!require("stringr")) {
 ```
 
 Die Dateien erst einlesen
-```{r}
-zulassungsdatei <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
-fahrzeugsdatei <- read.csv("C:\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
-komponentendatei <- read.csv("C:\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
+```
+zulassungsdatei <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+fahrzeugsdatei <- read.csv(".\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+komponentendatei <- read.csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
 ```
 
 Fahrzeuge in Wehr bzw. Landkreis Waldshut finden
-```{r}
+```
 wehr_datei <- zulassungsdatei[stringr::str_detect(zulassungsdatei$Gemeinden, "^WEHR\\d*$|^WEHR$"), ]
 wehr_id <- wehr_datei$IDNummer
 ```
 
-Fahrzeuge in Wehr in der Bestandteilendatei  finden
-```{r}
+Fahrzeuge in Wehr in der Bestandteilendatei finden
+```
 finde_fahrzeug <- fahrzeugsdatei[fahrzeugsdatei$ID_Fahrzeug %in% wehr_id, ]
 karosserie_id <- finde_fahrzeug$ID_Karosserie
 ```
 
 Nun Komponenten K7 in den Bestandteilen finden
-```{r}
+```
 suche_k7 <- komponentendatei[komponentendatei$IDNummer %in% karosserie_id, ]
 ```
 
 Hier wird die Anzahl der Übereinstimmungen gezählt
-```{r}
+```
 gesamt_anzahl <- nrow(suche_k7)
 ```
 
-Ausgabe
-```{r}
+Ausgabe der Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut
+```
 if (gesamt_anzahl > 0) {
   cat("Die gefundenen Komponenten: ", paste(suche_k7$IDNummer, collapse = ", "), "\n")
   cat("Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut: ", gesamt_anzahl, "\n")
@@ -250,25 +256,25 @@ if (gesamt_anzahl > 0) {
 
 ## Aufgabe 4
 
-### Datentypen, die die Attribute der Zulassungstabelle „Zulassungen_aller_Fahrzeuge“ haben
+### Die Datentypen, die die Attribute der Zulassungstabelle „Zulassungen_aller_Fahrzeuge“ haben, sind Integer und String
 
 Laden des knitr-Pakets
-```{r}         
+```         
 library(knitr)
 ```
 
 Daten aus der CSV-Datei lesen
-```{r}         
-daten <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+```         
+daten <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
 
 Typen der Daten für jede Spalte bestimmen
-```{r}         
+```         
 datentypen <- sapply(daten, class)
 ```
 
 Umwandlung der Datentypen in verständlichere Bezeichnungen
-```{r}         
+```         
 datentypen <- gsub("integer", "Integer", datentypen)
 datentypen <- gsub("character", "String", datentypen)
 datentypen <- gsub("factor", "Faktor", datentypen)
@@ -278,12 +284,12 @@ datentypen <- gsub("Date", "Datum", datentypen)
 ```
 
 Erstellen einer Tabelle für die Ausgabe
-```{r}         
+```         
 ausgabeDaten <- data.frame(Attribut = names(datentypen), Datentyp = datentypen, row.names = NULL)
 ```
 
 Ausgabe der Tabelle in einem schönen Format
-```{r}         
+```         
 kable(ausgabeDaten, format = "markdown", col.names = c("Attribut", "Datentyp"), row.names = FALSE)
 ```
 
@@ -292,63 +298,58 @@ kable(ausgabeDaten, format = "markdown", col.names = c("Attribut", "Datentyp"), 
 
 ### Warum ist es gerade dann sinnvoll, die Datensätze auf der Datenbank eines Servers abzulegen?
 
-### - Zugänglichkeit und Flexibilität:
-
+### - Zugänglichkeit und Flexibilität
 Datenbanken auf Servern sind über das Netzwerk zugänglich, was es mehreren Benutzern ermöglicht, gleichzeitig auf die Daten zuzugreifen und sie zu bearbeiten. Dies erleichtert die Zusammenarbeit und fördert die Effizienz bei der Verwaltung von Daten.
 
 ### - Sicherheit und Backups:
-
 Server-Datenbanken bieten oft erweiterte Sicherheitsmaßnahmen wie Zugriffssteuerung und regelmäßige Backups, um die Integrität der Daten zu gewährleisten. Auf einem persönlichen Computer besteht das Risiko von Datenverlust oder unbefugtem Zugriff, insbesondere wenn das Gerät nicht ausreichend geschützt ist.
 
 ### Warum können Sie die Datensätze nicht auf Ihrem persönlichen Computer ablegen?
 
-### - Begrenzte Ressourcen:
-
+### - Begrenzte Ressourcen
 Persönliche Computer haben begrenzte Speicher- und Verarbeitungskapazitäten im Vergleich zu Servern, die für den Einsatz in großen Netzwerken ausgelegt sind. Die Speicherung großer Datenmengen auf einem persönlichen Computer kann zu Leistungsproblemen und Einschränkungen bei der Skalierbarkeit führen.
 
-### - Mangelnde Zugänglichkeit und Zusammenarbeit:
-
+### - Mangelnde Zugänglichkeit und Zusammenarbeit
 Wenn die Daten nur auf einem persönlichen Computer gespeichert sind, können sie nicht leicht von anderen Benutzern abgerufen oder gemeinsam bearbeitet werden. Dies kann die Zusammenarbeit erschweren und die Effizienz beeinträchtigen.
 
-### Eine einfache Möglichkeit, die Applikation dem Kundenkreis zugänglich zu machen
+### Eine einfache Möglichkeit, die Applikation dem Kundenkreis zugänglich zu machen:
 
-### - Bereitstellung über das Internet:
-
+### - Bereitstellung über das Internet
 Durch Bereitstellung der Anwendung über das Internet können Benutzer von verschiedenen Standorten aus auf die Anwendung zugreifen, ohne dass sie zusätzliche Software installieren müssen. Dies erhöht die Benutzerfreundlichkeit und ermöglicht es einem breiteren Publikum, die Anwendung zu nutzen.
 
-### - Cloud-Hosting:
-
+### - Cloud-Hosting
 Die Nutzung von Cloud-Diensten wie Heroku, AWS oder Azure erleichtert die Bereitstellung und Verwaltung der Anwendung, da sie eine skalierbare Infrastruktur und verschiedene Dienste zur Verfügung stellen, um den Betrieb der Anwendung zu unterstützen. Dies ermöglicht es Entwicklern, sich auf die Entwicklung der Anwendung zu konzentrieren, anstatt sich um die zugrunde liegende Infrastruktur kümmern zu müssen.
 
 
 
 ## Aufgabe 6
-### Ort der Zulassung des Fahrzeuges mit der Karosseriebauteilnummer „K7-114-1142-31“
+
+### Der Ort, an dem das Fahrzeug mit der Karosseriebauteilnummer „K7-114-1142-31“ zugelassen wurde, ist ALLENDORF (EDER)
 
 Die Daten de Fahrzeuge werden erst geladen
-```{r}
-fahrzeug_daten <- read.csv("C:\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+```
+fahrzeug_daten <- read.csv(".\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
 ```
 
 Die Zulassungsdaten werden auch geladen
-```{r}
-zulassungen_daten <- read.csv("C:\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+```
+zulassungen_daten <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
 
 Hier wird die Fahrzeuge Karosserienummer gesucht
-```{r}
+```
 suche_fahrzeuge <- dplyr::filter(fahrzeug_daten, ID_Karosserie == "K7-114-1142-31")
 fahrzeug_id <- suche_fahrzeuge$ID_Fahrzeug
 ```
 
 Suche nach der Stadt in der das Fahrzeug zugelassen ist
-```{r}
+```
 findung_zulassungen <- zulassungen_daten[zulassungen_daten$IDNummer %in% fahrzeug_id,]
 zulassungsstadt <- findung_zulassungen$Gemeinden
 ```
 
 Ergebnis: Zulassungsstadt
-```{r}
+```
 if (length(zulassungsstadt) > 0) {
   cat("Das Fahrzeug wurde in", paste(zulassungsstadt, collapse=", "), "zugelassen.\n")
 } else {
