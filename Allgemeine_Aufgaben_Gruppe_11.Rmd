@@ -50,30 +50,30 @@ if (!require(magrittr)) {
 ## Aufgabe 1
 
 Laden der erforderlichen Pakete 
-``` 
+```{r} 
 library(dplyr)
 library(lubridate)
 ```
 
 Zunächst müssen zwei CSV-Dateien eingelesen werden, um sie für weitere Berechnungen zu einem Datenrahmen zusammenzufassen.
-```
-komponente_k7 <- read_csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
-logistikverzug_k7 <- read_csv(".\\Data\\Logistikverzug\\Logistikverzug_K7.csv", sep=";")
+```{r}
+komponente_k7 <- read.csv("Komponente_K7.csv", sep=";")
+logistikverzug_k7 <- read.csv("Logistikverzug_K7.csv", sep=";")
 ```
 
 Zusammenführung der Dateien anhand der IDNummer
-```
+```{r}
 gesamt_df <- merge(komponente_k7, logistikverzug_k7, by.x="IDNummer", by.y="IDNummer")
 ```
 
 Datumsumwandlung für die Berechnung des Logistikverzugs
-```
+```{r}
 gesamt_df$Produktionsdatum <- as.Date(gesamt_df$Produktionsdatum, format = "%Y-%m-%d")
 gesamt_df$Wareneingang <- as.Date(gesamt_df$Wareneingang, format = "%d.%m.%Y")
 ```
 
 Berechnung des Logistikverzugs in Tagen (unter Berücksichtigung eines weiteren Tags für Versandvorbereitung). Angenommen wurde, dass vom Zeitpunkt der Produktion bis zur Übergabe der Waren an die Logistik ein Tag vergeht und ein weiterer Tag für die Vorbereitung der Waren für den Versand benötigt wird. Um den Versandtag zu berechnen, müssen also zwei Tage zum Tag der Produktion der Waren hinzugezählt werden.
-```
+```{r}
 gesamt_df <- gesamt_df %>% 
   mutate(Logistikverzug = as.numeric(difftime(Wareneingang, Produktionsdatum + days(2)), units = "days"))
 
@@ -89,17 +89,17 @@ Mit Hilfe des untenstehenden Graphs und der Durchschnitts-, Minimal- und Maximal
 ### Minimaler und Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang sind jeweils 0 und 11 Tage
 
 Minimaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```     
+```{r}     
 min_zeit <- min(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Maximaler Zeitunterschied zwischen Warenausgang und Wareneingang
-```  
+```{r}  
 max_zeit <- max(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 Ausgabe der Ergebnisse
-```
+```{r}
 cat("Minimale Zeitunterschied zwischen Warenausgang und Wareneingang:", min_zeit, "Tage\n")
 cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit, "Tage\n")
 ```
@@ -109,20 +109,20 @@ cat("Maximale Zeitunterschied zwischen Warenausgang und Wareneingang:", max_zeit
 ### Der Mittelwert des Logistikverzugs ist 3.080437 Tage
 
 Mittelwert des Logistikverzugs berechnen
-``` 
+```{r} 
 mittelwert_logistikverzug <- mean(gesamt_df$Logistikverzug, na.rm = TRUE)
 ```
 
 
 Ausgabe des Mittelwerts
-``` 
+```{r} 
 cat("Mittelwert des Logistikverzugs:", mittelwert_logistikverzug, "Tage\n")
 ```
 
 ## d. Darstellung der Verteilung in geeigneter Weise mit Plotly
 
 Histogramm des Logistikverzugs erstellen
-```
+```{r}
 # Laden des erforderlichen Pakets
 library(ggplot2)
 
@@ -135,13 +135,13 @@ ggplot(gesamt_df, aes(x=Logistikverzug)) +
 ```
 
 Erstellen von Variablen für Jahr und Quartal
-```         
+```{r}         
 gesamt_df$Jahr <- year(as.Date(gesamt_df$Wareneingang))  # Jahr aus dem Wareneingangsdatum extrahieren
 gesamt_df$Quartal <- quarter(as.Date(gesamt_df$Wareneingang))  # Quartal aus dem Wareneingangsdatum extrahieren
 ```
 
 Berechnung der durchschnittlichen Verzögerung pro Jahr und Quartal
-```         
+```{r}         
 jahr_quartal_zusammenfassung <- gesamt_df %>%
   group_by(Jahr, Quartal) %>%
   summarise(Durchschnittliche_Verzögerung = mean(Logistikverzug, na.rm = TRUE),
@@ -150,14 +150,14 @@ jahr_quartal_zusammenfassung <- gesamt_df %>%
 ```
 
 Berechnung der Gesamtdurchschnittswerte pro Quartal
-```         
+```{r}         
 gesamt_mittelwerte <- jahr_quartal_zusammenfassung %>%
   group_by(Quartal) %>%
   summarise(Gesamtdurchschnitt = mean(Durchschnittliche_Verzögerung))
 ```
 
 Erstellen des Diagramms
-```         
+```{r}         
 p <- ggplot(jahr_quartal_zusammenfassung, aes(x = Jahr, y = Durchschnittliche_Verzögerung, group = Quartal, color = factor(Quartal))) +
   geom_line(linewidth = 1.5) +  # Verwenden von linewidth anstelle von size
   geom_point(size = 3) +  # Beibehalten der Punktegröße
@@ -171,7 +171,7 @@ p <- ggplot(jahr_quartal_zusammenfassung, aes(x = Jahr, y = Durchschnittliche_Ve
 ```
 
 Hinzufügen von Annotationen mit den Gesamtdurchschnittswerten
-```         
+```{r}         
 for(i in 1:nrow(gesamt_mittelwerte)) {
   p <- p + annotate("text", x = max(jahr_quartal_zusammenfassung$Jahr), y = gesamt_mittelwerte$Gesamtdurchschnitt[i], 
                     label = paste("Q", gesamt_mittelwerte$Quartal[i], ":", round(gesamt_mittelwerte$Gesamtdurchschnitt[i], 2), "Tage"), 
@@ -180,7 +180,7 @@ for(i in 1:nrow(gesamt_mittelwerte)) {
 ```
 
 Anzeigen des Diagramms
-```         
+```{r}         
 print(p)      
 ```
 
@@ -210,7 +210,7 @@ Das zugrunde liegende Datenbankkonzept, bei dem Daten in separaten Dateien organ
 ## Aufgabe 3  
 
 ### Die Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut ist 30
-```
+```{r}
 # Ladung des Pakets stringr, falls noch nicht installiert
 if (!require("stringr")) {
   install.packages("stringr")
@@ -219,36 +219,36 @@ if (!require("stringr")) {
 ```
 
 Die Dateien erst einlesen
-```
-zulassungsdatei <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
-fahrzeugsdatei <- read.csv(".\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
-komponentendatei <- read.csv(".\\Data\\Logistikverzug\\Komponente_K7.csv", sep=";")
+```{r}
+zulassungsdatei <- read.csv("Zulassungen_alle_Fahrzeuge.csv", sep=";")
+fahrzeugsdatei <- read.csv("Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+komponentendatei <- read.csv("Komponente_K7.csv", sep=";")
 ```
 
 Fahrzeuge in Wehr bzw. Landkreis Waldshut finden
-```
+```{r}
 wehr_datei <- zulassungsdatei[stringr::str_detect(zulassungsdatei$Gemeinden, "^WEHR\\d*$|^WEHR$"), ]
 wehr_id <- wehr_datei$IDNummer
 ```
 
 Fahrzeuge in Wehr in der Bestandteilendatei finden
-```
+```{r}
 finde_fahrzeug <- fahrzeugsdatei[fahrzeugsdatei$ID_Fahrzeug %in% wehr_id, ]
 karosserie_id <- finde_fahrzeug$ID_Karosserie
 ```
 
 Nun Komponenten K7 in den Bestandteilen finden
-```
+```{r}
 suche_k7 <- komponentendatei[komponentendatei$IDNummer %in% karosserie_id, ]
 ```
 
 Hier wird die Anzahl der Übereinstimmungen gezählt
-```
+```{r}
 gesamt_anzahl <- nrow(suche_k7)
 ```
 
 Ausgabe der Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut
-```
+```{r}
 if (gesamt_anzahl > 0) {
   cat("Die gefundenen Komponenten: ", paste(suche_k7$IDNummer, collapse = ", "), "\n")
   cat("Anzahl der zugelassenen Fahrzeuge mit Komponenten K7 in Wehr, Landkreis Waldshut: ", gesamt_anzahl, "\n")
@@ -263,22 +263,22 @@ if (gesamt_anzahl > 0) {
 ### Die Datentypen, die die Attribute der Zulassungstabelle „Zulassungen_aller_Fahrzeuge“ haben, sind Integer und String
 
 Laden des knitr-Pakets
-```         
+```{r}         
 library(knitr)
 ```
 
 Daten aus der CSV-Datei lesen
-```         
-daten <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+```{r}         
+daten <- read.csv("Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
 
 Typen der Daten für jede Spalte bestimmen
-```         
+```{r}         
 datentypen <- sapply(daten, class)
 ```
 
 Umwandlung der Datentypen in verständlichere Bezeichnungen
-```         
+```{r}         
 datentypen <- gsub("integer", "Integer", datentypen)
 datentypen <- gsub("character", "String", datentypen)
 datentypen <- gsub("factor", "Faktor", datentypen)
@@ -288,12 +288,12 @@ datentypen <- gsub("Date", "Datum", datentypen)
 ```
 
 Erstellen einer Tabelle für die Ausgabe
-```         
+```{r}         
 ausgabeDaten <- data.frame(Attribut = names(datentypen), Datentyp = datentypen, row.names = NULL)
 ```
 
 Ausgabe der Tabelle in einem schönen Format
-```         
+```{r}         
 kable(ausgabeDaten, format = "markdown", col.names = c("Attribut", "Datentyp"), row.names = FALSE)
 ```
 
@@ -331,29 +331,29 @@ Die Nutzung von Cloud-Diensten wie Heroku, AWS oder Azure erleichtert die Bereit
 ### Der Ort, an dem das Fahrzeug mit der Karosseriebauteilnummer „K7-114-1142-31“ zugelassen wurde, ist ALLENDORF (EDER)
 
 Die Daten de Fahrzeuge werden erst geladen
-```
-fahrzeug_daten <- read.csv(".\\Data\\Fahrzeug\\Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
+```{r}
+fahrzeug_daten <- read.csv("Bestandteile_Fahrzeuge_OEM2_Typ22.csv", sep=";")
 ```
 
 Die Zulassungsdaten werden auch geladen
-```
-zulassungen_daten <- read.csv(".\\Data\\Zulassungen\\Zulassungen_alle_Fahrzeuge.csv", sep=";")
+```{r}
+zulassungen_daten <- read.csv("Zulassungen_alle_Fahrzeuge.csv", sep=";")
 ```
 
 Hier wird die Fahrzeuge Karosserienummer gesucht
-```
+```{r}
 suche_fahrzeuge <- dplyr::filter(fahrzeug_daten, ID_Karosserie == "K7-114-1142-31")
 fahrzeug_id <- suche_fahrzeuge$ID_Fahrzeug
 ```
 
 Suche nach der Stadt in der das Fahrzeug zugelassen ist
-```
+```{r}
 findung_zulassungen <- zulassungen_daten[zulassungen_daten$IDNummer %in% fahrzeug_id,]
 zulassungsstadt <- findung_zulassungen$Gemeinden
 ```
 
 Ergebnis: Zulassungsstadt
-```
+```{r}
 if (length(zulassungsstadt) > 0) {
   cat("Das Fahrzeug wurde in", paste(zulassungsstadt, collapse=", "), "zugelassen.\n")
 } else {
