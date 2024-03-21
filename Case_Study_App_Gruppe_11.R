@@ -409,3 +409,198 @@ result <- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, K
 
 # 14. Abschliessend wird die finale Tabelle als .csv Datei gespeichert.
 write_csv(result, "Final_Data_Group11.csv")
+
+
+
+# App ---------------------------------------------------------------------
+
+install.packages("pacman")
+pacman::p_load(shiny,shinyWidgets,ggplot2, tidyverse, dplyr,stringr,DescTools)
+
+
+##### Data_final einlesen 
+data_final <- read.csv("Final_Data_Group11.csv")
+##### Hersteller --> char
+data_final$Herstellernummer <- as.character(data_final$Herstellernummer)
+##### Produktionsdatum --> Date
+data_final$Produktionsdatum <- as.Date(data_final$Produktionsdatum)
+
+
+##### UI ######
+ui <- fluidPage(
+  
+  #### Schrift "Roboto-Font" von Google
+  tags$head(
+    #### Note the wrapping of the string in HTML()
+    tags$style(HTML("
+      @import url('https://fonts.googleapis.com/css2?family=Micro+5&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap", rel="stylesheet');
+      *{
+        font-family: 'Roboto', sans-serif;
+      }"))
+  ),
+  
+  
+  #### Background color
+  setBackgroundColor(
+    color = c("#FFFFFF", "#B0C4DE"),
+    gradient = "linear",
+    direction = "bottom"
+  ),
+  
+  
+  #### Application title with Logo
+  titlePanel(title = span(
+    img(src = "IWF_Logo.png", height = 25),
+    h1("OEM1 Gewinneranalyse Modell Typ 11")
+    )),
+  
+  
+  #### Gestaltung Frontpages
+  tabsetPanel(
+    
+    ### 1. Seite, Aufgabe 4a
+    tabPanel(h4("Zuliefererqualität"),
+             sidebarLayout(
+               sidebarPanel(
+                 h5("Einstellungen")
+               ),
+               mainPanel(h5("Laufleistung der ausgefallenen Komponenten als Liniendiagramm und Boxplot")
+               ))),
+    
+    
+    
+    ### 2. Seite, Aufgabe 4c
+    tabPanel(h4("Lieferdauer"),
+             sidebarLayout(
+               
+               sidebarPanel(
+                 selectInput("hersteller", "Hersteller auswählen", 
+                             choices = data_final %>%
+                               filter(between(Produktionsdatum, as.Date('2013-01-01'), as.Date('2015-12-31'))) %>%
+                               filter(str_detect(ID_Self, "^K1") | str_detect(ID_Self, "^K3")) %>%
+                               select(Herstellernummer) %>%
+                               unique(),
+                             selected = "101",
+                             multiple = TRUE
+                 ),
+                 radioButtons("diagramm", "Diagramm auswählen", choices = list("Liniendiagramm", "Boxplot"), select = "Liniendiagramm"),
+                 radioButtons("verteilung", "Modus für Liniendiagramm auswählen", choices = list("Mittelwert", "Median"), select = "Mittelwert"), width = 2                       
+               ),
+               
+               
+               mainPanel( 
+                         plotOutput("lieferdauerDia"),
+                         width = 10 
+               )
+             )
+    ),
+    
+    ### 3. Seite, Aufgabe 4d
+    tabPanel(h4("Datensatz"), 
+             dataTableOutput("datensatz")
+    )
+  )
+)
+
+
+
+###### SERVER ######
+server <- function(input, output) {
+  
+  ### 4a)
+  
+  
+  
+  ### 4b)
+  
+  
+  
+  ### 4c) Kategorie "Just in Time" 
+  
+  
+  # Input Hersteller und Filtern nach K1 und K3
+  selected_Lieferant <- reactive({
+    req(input$hersteller)
+    data_final %>%
+      filter(between(Produktionsdatum, as.Date('2013-01-01'), as.Date('2015-12-31'))) %>%
+      filter(Herstellernummer %in% input$hersteller) %>%
+      filter(str_detect(ID_Self, "^K1") | str_detect(ID_Self, "^K3")) %>%
+      group_by(Herstellernummer) %>%
+      count(Lieferdauer)
+  })
+  
+
+  # Output Diagramme
+  output$lieferdauerDia <- renderPlot({
+    
+    if(input$diagramm == "Liniendiagramm"){
+      
+      ## Summe der absoluten Häufigkeit n
+      Sum_n <- aggregate(n ~ Herstellernummer, selected_Lieferant(), FUN = sum)
+      
+      
+      ## Dokument für Diagramm df 
+      df_4c <- merge(selected_Lieferant(), Sum_n, by.x = "Herstellernummer", by.y = "Herstellernummer")
+      df_4c$Relative_Häufigkeit <- df_4c$n.x / df_4c$n.y
+      df_4c$Ld_mult_n <- df_4c$Lieferdauer * df_4c$n.x
+      
+      
+      ## Summe Lieferdauer*absolute Häufigkeit
+      Sum_Ld_mult_n <- df_4c %>% 
+        group_by(Herstellernummer) %>% 
+        summarize(Summe = sum(Ld_mult_n))
+      
+      ## Mittelwert
+      Mean <- merge(Sum_Ld_mult_n, Sum_n, by.x = "Herstellernummer", by.y = "Herstellernummer")
+      Mean$Mean <- Mean$Summe/Mean$n
+      
+      ## Median
+      Median <- df_4c %>% 
+        group_by(Herstellernummer) %>% 
+        summarize(Median = Median(Lieferdauer, n.x))
+      
+      
+      ## Plotting Liniendiagramm
+      ggplot(data = df_4c,
+             (aes(x = Lieferdauer, y = Relative_Häufigkeit, colour = Herstellernummer))) + 
+        geom_line() +
+          geom_point(size=1,
+                   color="black") +
+            coord_cartesian(xlim = c(0,20), ylim = c(0,1)) +
+              ggtitle("Verteilung der Lieferdauer") +
+                theme(plot.title = element_text(hjust = 0.5)) +
+                  xlab("Lieferdauer in [d]") + 
+                ylab("Anzahl in [%]") + 
+            scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+        scale_x_continuous(breaks = seq(0, 20, 1)) +
+      if (input$verteilung == "Mittelwert") {
+          geom_vline(data = Mean, aes(xintercept = Mean, color = Herstellernummer), linewidth=0.5)
+        }
+      else {
+        geom_vline(data = Median, aes(xintercept = Median, color = Herstellernummer), linewidth=0.5)
+      }
+    }
+    
+    
+    ## Plotting Boxplot
+    else{
+      ggplot(data = selected_Lieferant(),
+             aes(x = Lieferdauer, y = Herstellernummer, colour = Herstellernummer, weight = n)) + 
+        geom_boxplot() +
+          ggtitle("Verteilung der Lieferdauer") +
+            theme(plot.title = element_text(hjust = 0.5)) +
+          xlab("Lieferdauer in [d]") + 
+        ylab("Herstellernummer") +
+      scale_x_continuous(breaks = seq(0, 20, 1))
+    }
+    
+  })
+  
+  ### 4d) Datensatz darstellen  
+  output$datensatz <- renderDataTable(data_final)
+  
+}
+
+##### RUN APP ##### 
+shinyApp(ui = ui, server = server)
+

@@ -294,10 +294,165 @@ result <- bind_rows(list(Komponente_K1BE1, Komponente_K1DI1 ,Komponente_K2LE1, K
 ```
 write_csv(result, "Final_Data_Group11.csv")
 ```
+# Shiny App
+In diesem Abschnitt wird das Erstellen der Shiny App beschrieben.
 
-# Für Vera und Minh
-Folgende Gliederungspunkte sollen im Inhaltsverzeichnis mindestens aufgeführt werden:
+Anmerkung zur Aufgabenverteilung: Eine Person hat das Layout und Kategorie "Just in Time" (Aufgabe 3, 4c, 4d) und die andere Person Kategorie "Zuliefererqualität" (Aufgabe 4a, 4b) für die Shiny bearbeitet. Die Auswertung und Ergebnisse sollten zusammen erarbeitet werden. Durch den Ausstieg eines Gruppenmitgeliedes kurz vor dem Abgabetermin, werden die Lösung und Codes der verbleiben Person dargestellt. Folglich wird die Auswertung und das Ergebnis nur bezüglich der Katergorie "Just in Time" beschrieben.
+
+## Vorbereitung
+Zunächst wird das Package Pacman installiert und weitere benötigten Packages mithilfe der p_load Funktion falls nötig installiert und geladen.
+```
+install.packages("pacman")
+pacman::p_load(tidyr,readr,shiny,shinyWidgets,ggplot2,dplyr,stringr,DescTools)
+```
+Danach wird die Datei "Final_Data_Group11.csv" eingelesen und bearbeitet. Die Herstellernummer müssen in Character für die Darstellung in den Diagrammen umgewandlet werden. Des Weiteren müssen die Produktionsdaten als Date abgespeichert, damit sie gefiltert werden können. 
+
+```
+data_final <- read.csv("Final_Data_Group11.csv")
+
+data_final$Herstellernummer <- as.character(data_final$Herstellernummer)
+
+data_final$Produktionsdatum <- as.Date(data_final$Produktionsdatum)
+```
+
+
+## UI
+Mit dem ersten Abschnitt in der UI werden die Layouts der App eingestellt. 
+Es wird die Schrift "Roboto-Font" von Google ausgewählt und in die Shiny-App eingebettet. 
+
+```
+tags$head(
+    tags$style(HTML("
+      @import url('https://fonts.googleapis.com/css2?family=Micro+5&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap", rel="stylesheet');
+      *{
+        font-family: 'Roboto', sans-serif;
+      }"))
+  )
+```
+Für die Hintergrundfarbe wird der Übergang von Weiß zu Lightsteelblue gewählt.
+
+```
+  setBackgroundColor(
+    color = c("#FFFFFF", "#B0C4DE"),
+    gradient = "linear",
+    direction = "bottom"
+  )
+```
+Als Logo wird das IWF_Logo verwendet und Titel der App lautet "OEM1 Gewinneranalyse Modell Typ 11".
+
+```
+titlePanel(title = span(img(src = "IWF_Logo.png", height = 25), h1("OEM1 Gewinneranalyse Modell Typ 11")))
+```
+In Der App werden drei Seiten dargestellt: Die erste Seite mit den Aufgaben 4a und 4b, die zweite Seite für Aufgabe 4c und die letzte Seite zeigt den kompletten Datensatz. Dementsprechen befindet sich im tabsetPanel drei tabPanel. Die wiederum aus einem sidebarPanel, die mit den Input-Einstellungen versehen sind, und aus einem mainPanel, die die Diagramme darstellen, bestehen.
+```
+ tabPanel(h4("Panel Titel"),
+             sidebarLayout(
+               sidebarPanel(
+                 h5("Input-Einstellungen")
+               ),
+               mainPanel(h5("Diagramme")
+               )))
+```
+Auf der zweiten Seite für die Aufgabe 4c sind ein selectInput und zwei radioButtons verfügbar. Mit dem selectInput werden Hersteller ausgewählt, deren ID mit K1 oder K3 beginnen. K1 steht für Motoren un K3 für Schaltungen  Des Weiteren werden nur Lieferungen im Zeitraum von Anfang 2013 bis Ende 2015 betrachetet.
+
+```
+selectInput("hersteller", "Hersteller auswählen", 
+                             choices = data_final %>%
+                               filter(Datum) %>%
+                               filter(K1 und K3) %>%
+                               select(Herstellernummer) %>%
+                               unique()
+                 )
+```
+Mit dem ersten radioButtons kann man zwischen Liniendiagramm oder Boxplot auswählen und mit dem zweiten die Anzeige des Medians oder Mittelwertes bei dem Liniendiagramm. Der Boxplot benötigt dies nicht, weil es automatisch den Median anzeigt. 
+```
+radioButtons("diagramm", "Diagramm auswählen", choices = list("Liniendiagramm", "Boxplot")),
+radioButtons("verteilung", "Verteilung bei Liniendiaframm auswählen", choices = list("Mittelwert", "Median"))
+```
+
+
+## Server
+Eine reactive-Funktion wird verwendet, um den Input des Users für die Hersteller-Auswahl aufzunehmen. Danach wird der Datensatz nach dem Input und den relevanten Daten aus der Aufgabenstellung gefiltert und die Anzahl der Lieferungen n pro Lieferdauer gezählt.
+
+```
+selected_Lieferant <- reactive({
+    req(input$hersteller)
+    data_final %>%
+      filter(Datum) %>%
+      filter(Herstellernummer %in% input$hersteller) %>%
+      filter(Komponente) %>%
+      group_by(Herstellernummer) %>%
+      count(Lieferdauer)
+  })
+```
+Im rendePlot wird differenziert welche Art von Diagramm ausgewählt und dargestellt werden soll.
+```
+if(input$diagramm == "Liniendiagramm"){plot Liniendiagramm}
+
+else{plot Boxplot}
+
+```
+Innerhalb der If-Schleife für das Liniendiagramm werden alle benötigten Parameter erstellt. Zunächst wird die relative Häufigkeit der Lieferdauer berechnet. Dafür wird die absolute Häufigkeit der Lieferdauer n summiert, Sum_n.
+```
+Sum_n <- aggregate(n ~ Herstellernummer, selected_Lieferant(), FUN = sum)
+```
+Danach wird Sum_n mit der selecte_Lieferant() über die Hersteller-Spalte zum Dataframe df_4c verbunden, sodass eine neue Spalte mit den relativen Häufigkeiten erstellt werden kann (Absolute Häufigkeit pro Lieferdauer/Summe absolute Häufigkeit).
+```
+df_4c <- merge(selected_Lieferant(), Sum_n, by.x = "Herstellernummer", by.y = "Herstellernummer")
+df_4c$Relative_Häufigkeit <- df_4c$n.x / df_4c$n.y
+```
+Nun kann die Lieferdauer auf der x-Achse und die relative Häufigkeit auf der y-Achse pro Hersteller mit ggplot dargestellt werden.
+```
+ggplot(data = df_4c,
+        (aes(x = Lieferdauer, y = Relative_Häufigkeit, colour = Herstellernummer))) + 
+      geom_line() + ...
+```
+Eine weitere Einstellung ist die Art der Verteilung für das Liniendiagramm. Es soll eine vertikale Linie im Diagramm dargestellt werden, die das Medium oder den Mittelwert wiederspiegelt. Hierbei wird ebenfalls mit einer if-else-Schleife gearbeitet.
+```
+if (input$verteilung == "Mittelwert") {
+  geom_vline(data = Mean, aes(xintercept = Mean, color = Herstellernummer), linewidth=0.5)
+}
+
+else {
+  geom_vline(data = Median, aes(xintercept = Median, color = Herstellernummer), linewidth=0.5)
+}
+```
+geom_vline verwendet je nach Input Daten aus dem Dataframe "Medium" oder "Mean". "Medium" wird mit der gewichtet Funktion Median() aus dem Package DescTools erstellt. Dabei wird das Medium für die Spalte "Lieferdauer" aus der Dataframe ""df_4c" mit der absoluten Häufigkeit gewichtet und berechnet.
+```
+Median <- df_4c %>% 
+  group_by(Herstellernummer) %>% 
+  summarize(Median = Median(Lieferdauer, n.x))
+```
+Den Mittelwert berechnet man indem die Lieferdauer mit der absoluten Häufigkeit multipliziert wird, dann aufsummiert und zum Schluss durch die Summe der absoluten Häufigkeit dividiert (Mean = sum(Lieferdauer * absHäufigkeit)/sum(absHäufigkeit)). 
+```
+      ## Summe Lieferdauer*absolute Häufigkeit
+      Sum_Ld_mult_n <- df_4c %>% 
+        group_by(Herstellernummer) %>% 
+        summarize(Summe = sum(Ld_mult_n))
+      
+      ## Mittelwert
+      Mean <- merge(Sum_Ld_mult_n, Sum_n, by.x = "Herstellernummer", by.y = "Herstellernummer")
+      Mean$Mean <- Mean$Summe/Mean$n
+```
+Damit ist die If Schleife für das Liniendiagramm abgeschlossen.
+
+Der Boxplot hat auf der x_Achse die Lieferdauer und auf der y-Achse die Herstellernummer. Mit der Funktion "weight" kann man die Daten eine Gewichtung zuteilen. In diesem Fall ist es "weight" für die Lieferdauer die absolute Häufigkeit.
+```
+ggplot(data = selected_Lieferant(),
+    aes(x = Lieferdauer, y = Herstellernummer, colour = Herstellernummer, weight = n)) + 
+geom_boxplot() + ...
+```
+
+Anmerkung: Da es nur vier Lieferanten für die Komponenten Motor und Schaltungen existieren, wird die Funktion "Top 3 bzw. 5" nicht mit eingebaut.
 
 # Auswertung
+Es gibt vier Lieferanten die Schaltungen oder Motoren im Zeitraumm von Anfang 1013 bis Ende 2015 geliefert haben. Die Herstellernummern lauten 101, 102, 104 und 105. Im Liniendiagramm mit dem Mittelwert wird deutlich, dass 102 und 104 eine Lieferdauer von ca. 7 Tage haben, wo bei 102 minimal vor dem Mittelwert von 104 liegt. 101 hat ein Mittelwert von ca. 10 Tagen und 105 von ca. 11 Tagen.
+
+![Liniendiagramm mit Mittelwert](Additional_files/LieferdauerMean.png)
+
+Im Boxplot mit dem Median wird deutlich, dass 102 und 104 ebenfalls eine Lieferdauer von ca. 7 Tage haben. 101 hat ein Median von 8 Tagen und 105 von 11 Tagen.
+
+![Boxplot mit Median](Additional_files/LieferdauerMedian.png)
 
 # Ergebnis
+Der Sieger in der Katgorie "Just in Time" ist die 102. Knapp gefolgt von 104. Auf dem dritten PLatz ist die 101 und auf dem letzten Platz ist die 105.
